@@ -3,6 +3,7 @@
 package me.neon.libs.taboolib.chat
 
 import me.neon.libs.NeonLibsLoader
+import me.neon.libs.event.SubscribeEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -11,21 +12,17 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.concurrent.ConcurrentHashMap
 
-class ChatCapture: Listener {
+internal object ChatCapture {
 
-    companion object {
+    val inputs = ConcurrentHashMap<String, (String) -> Unit>()
 
-        val inputs = ConcurrentHashMap<String, (String) -> Unit>()
-    }
-
-    @EventHandler
+    @SubscribeEvent
     fun e(e: PlayerQuitEvent) {
         inputs.remove(e.player.name)
     }
 
-    @EventHandler
+    @SubscribeEvent
     fun e(e: AsyncPlayerChatEvent) {
-        e.player.location.yaw
         if (inputs.containsKey(e.player.name)) {
             inputs.remove(e.player.name)?.invoke(e.message)
             e.isCancelled = true
@@ -60,7 +57,7 @@ class ChatCapture: Listener {
         } else {
             ChatCapture.inputs[name] = func
 
-            Bukkit.getScheduler().runTaskLater(NeonLibsLoader.instance, Runnable {
+            Bukkit.getScheduler().runTaskLater(NeonLibsLoader.getInstance(), Runnable {
                 if (ChatCapture.inputs.containsKey(name)) {
                     timeout(this@nextChatInTick)
                     ChatCapture.inputs.remove(name)

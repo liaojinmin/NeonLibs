@@ -1,23 +1,38 @@
 package me.neon.libs.smtp
 
-
-import me.neon.libs.utils.io.asyncRunner
-import me.neon.libs.utils.warning
+import me.neon.libs.NeonLibsLoader
+import me.neon.libs.util.asyncRunner
 import org.bukkit.plugin.Plugin
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.util.*
-import javax.mail.Authenticator
-import javax.mail.Message
-import javax.mail.PasswordAuthentication
-import javax.mail.Session
-import javax.mail.Transport
+import javax.mail.*
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
 
 
+@me.neon.libs.core.env.RuntimeDependencies(
+    me.neon.libs.core.env.RuntimeDependency(
+        value = "!javax.mail:mail:1.5.0-b01",
+        test = "javax.mail.Version",
+        relocate = ["!javax.mail", "javax.mail"],
+        transitive = false
+    ),
+    me.neon.libs.core.env.RuntimeDependency(
+        value = "!javax.activation:activation:1.1.1",
+        test = "javax.activation.URLDataSource",
+        relocate = ["!javax.activation", "javax.activation"],
+        transitive = false
+    ),
+    me.neon.libs.core.env.RuntimeDependency(
+        value = "!redis.clients:jedis:4.2.2",
+        test = "redis.clients.jedis.BuilderFactory",
+        relocate = ["!redis.clients", "redis.clients"],
+        transitive = false
+    )
+)
 class SmtpService(
     private val plugin: Plugin,
     private val param: MutableMap<String, String>
@@ -50,7 +65,7 @@ class SmtpService(
                 transport.sendMessage(message, message.allRecipients)
             }
             onError {
-                warning("发送自定义html时出现异常")
+                NeonLibsLoader.warning("发送自定义html时出现异常")
                 it.printStackTrace()
             }
         }

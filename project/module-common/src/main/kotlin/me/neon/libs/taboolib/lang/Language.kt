@@ -1,10 +1,11 @@
 package me.neon.libs.taboolib.lang
 
+import me.neon.libs.io.forFile
 import me.neon.libs.taboolib.lang.type.*
-import me.neon.libs.utils.io.forFile
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -17,6 +18,7 @@ import kotlin.collections.HashMap
  */
 object Language {
 
+    internal val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
     /** 语言文件路径 */
     internal var path = "lang"
@@ -69,7 +71,6 @@ object Language {
 
     /** 获取玩家语言 */
     fun getLocale(player: Player): String {
-        //player.getMetadata()
         return languageCodeTransfer[player.locale.lowercase()] ?: player.locale
     }
 

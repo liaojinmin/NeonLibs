@@ -12,6 +12,7 @@ import org.bukkit.entity.Player
  * @author 老廖
  * @since 2024/1/17 19:56
  */
+@Deprecated("弃用")
 class HookMoney: HookPlugin() {
 
     private var economy: Economy? = null
@@ -34,6 +35,10 @@ class HookMoney: HookPlugin() {
 
     fun takeMoney(player: Player, amt: Double) {
         economy?.withdrawPlayer(player, amt)
+    }
+
+    fun getMoney(player: Player): Double {
+        return economy?.getBalance(player) ?: 0.0
     }
 
     fun hasMoney(player: Player, amt: Double): Boolean {

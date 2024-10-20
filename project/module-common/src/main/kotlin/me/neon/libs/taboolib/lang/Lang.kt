@@ -1,5 +1,6 @@
 package me.neon.libs.taboolib.lang
 
+import me.neon.libs.taboolib.lang.type.TypeText
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
@@ -16,6 +17,18 @@ fun CommandSender.sendLang(plugin: Plugin, node: String, vararg args: Any) {
             sendMessage("{$node}")
         }
     }
+}
+
+fun CommandSender.asLangText(plugin: Plugin, node: String, vararg args: Any): String {
+    return asLangTextOrNull(plugin, node, *args) ?: "{$node}"
+}
+
+fun CommandSender.asLangTextOrNull(plugin: Plugin, node: String, vararg args: Any): String? {
+    val file = getLocaleFile(plugin)
+    if (file != null) {
+        return (file.nodes[node] as? TypeText)?.asText(this, *args)
+    }
+    return null
 }
 
 fun CommandSender.getLocales(): String {

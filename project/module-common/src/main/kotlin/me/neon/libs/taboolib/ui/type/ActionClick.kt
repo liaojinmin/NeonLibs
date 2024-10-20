@@ -1,8 +1,7 @@
 package me.neon.libs.taboolib.ui.type
 
-
-import org.bukkit.inventory.ItemStack
 import me.neon.libs.taboolib.ui.ClickEvent
+import org.bukkit.inventory.ItemStack
 
 class ActionClick : Action() {
 

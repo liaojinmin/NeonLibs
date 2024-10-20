@@ -1,7 +1,7 @@
 package me.neon.libs.taboolib.cmd.component
 
 import me.neon.libs.taboolib.cmd.CommandContext
-import me.neon.libs.utils.subList
+import me.neon.libs.util.subList
 import org.bukkit.command.CommandSender
 
 

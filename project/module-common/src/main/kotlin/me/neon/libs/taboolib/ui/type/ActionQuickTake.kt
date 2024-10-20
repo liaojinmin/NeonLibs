@@ -1,10 +1,9 @@
 package me.neon.libs.taboolib.ui.type
 
-import me.neon.libs.taboolib.ui.ItemStacker
-import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
 import me.neon.libs.taboolib.ui.ClickEvent
-
+import me.neon.libs.taboolib.ui.ItemStacker
+import me.neon.libs.util.item.isNotAir
+import org.bukkit.inventory.ItemStack
 
 class ActionQuickTake : Action() {
 
@@ -13,7 +12,7 @@ class ActionQuickTake : Action() {
     }
 
     override fun setCursor(e: ClickEvent, item: ItemStack?) {
-        if (item != null && item.type != Material.AIR) {
+        if (item.isNotAir()) {
             ItemStacker.MINECRAFT.moveItemFromChest(item, e.clicker)
         }
         e.clicker.setItemOnCursor(null)

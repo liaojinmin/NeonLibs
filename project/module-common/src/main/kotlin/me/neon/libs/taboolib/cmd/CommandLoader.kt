@@ -1,6 +1,7 @@
 package me.neon.libs.taboolib.cmd
 
-import me.neon.libs.NeonLibsLoader
+import me.neon.libs.core.LifeCycle
+import me.neon.libs.core.inject.Awake
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.command.*
@@ -45,14 +46,14 @@ object CommandLoader {
         completer: CommandCompleter,
      //   commandBuilder: CommandBase.() -> Unit,
     ) {
-        val pluginCommand = constructor.newInstance(command.name, NeonLibsLoader.instance)
+        val pluginCommand = constructor.newInstance(command.name, plugin)
         pluginCommand.setExecutor { sender, _, label, args ->
             executor.execute(sender, command, label, args)
         }
         pluginCommand.setTabCompleter { sender, _, label, args ->
             completer.execute(sender, command, label, args) ?: emptyList()
         }
-        val permission = command.permission.ifEmpty { "${NeonLibsLoader.instance.name.lowercase()}.command.${command.name}.use" }
+        val permission = command.permission.ifEmpty { "${plugin.name.lowercase()}.command.${command.name}.use" }
         // 修改属性
         pluginCommand.setProperty("description", command.description.ifEmpty { command.name })
         pluginCommand.setProperty("usageMessage", command.usage)
@@ -75,23 +76,28 @@ object CommandLoader {
 
         // 注册命令
         knownCommands.remove(command.name)
-        knownCommands["${NeonLibsLoader.instance.name.lowercase()}:${pluginCommand.name}"] = pluginCommand
+        knownCommands["${plugin.name.lowercase()}:${pluginCommand.name}"] = pluginCommand
         knownCommands[pluginCommand.name] = pluginCommand
         pluginCommand.aliases.forEach {
             knownCommands[it] = pluginCommand
         }
         pluginCommand.register(commandMap)
 
-        kotlin.runCatching {
+        runCatching {
             if (pluginCommand.getProperty<Any>("timings") == null) {
                 val timingsManager = Class.forName("co.aikar.timings.TimingsManager")
-                pluginCommand.setProperty("timings", timingsManager.invokeMethod("getCommandTiming", NeonLibsLoader.instance.name, pluginCommand))
+                pluginCommand.setProperty("timings", timingsManager.invokeMethod("getCommandTiming", plugin.name, pluginCommand))
             }
         }
         sync()
+        registeredCommands.computeIfAbsent(plugin) { mutableListOf() }.add(command)
+
+        /*
         registeredCommands.compute(plugin) { _, value ->
             value?.also { it.add(command) } ?: mutableListOf<CommandStructure>().apply { add(command) }
         }
+
+         */
     }
 
     fun unregisterCommand(plugin: Plugin) {
@@ -102,6 +108,7 @@ object CommandLoader {
         sync()
     }
 
+    @Awake(LifeCycle.DISABLE)
     fun unregisterCommands() {
         registeredCommands.values.forEach {
             it.forEach { da ->
@@ -134,9 +141,9 @@ object CommandLoader {
 
     private fun sync() {
         // 1.13 sync commands
-        kotlin.runCatching {
+        runCatching {
             Bukkit.getServer().invokeMethod<Void>("syncCommands")
-            Bukkit.getOnlinePlayers().forEach { it.updateCommands() }
+            Bukkit.getOnlinePlayers().forEach { it.invokeMethod<Void>("updateCommands")}
             isSupportedUnknownCommand = true
         }
     }

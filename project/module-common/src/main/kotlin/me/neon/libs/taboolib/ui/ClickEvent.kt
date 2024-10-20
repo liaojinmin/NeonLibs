@@ -1,5 +1,6 @@
 package me.neon.libs.taboolib.ui
 
+import me.neon.libs.taboolib.ui.type.Chest
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -7,13 +8,12 @@ import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
-import me.neon.libs.taboolib.ui.type.Basic
 
 /**
  * @author 坏黑
  * @since 2019-05-21 18:09
  */
-class ClickEvent(private val bukkitEvent: InventoryInteractEvent, val clickType: ClickType, val slot: Char, val builder: Basic) {
+class ClickEvent(private val bukkitEvent: InventoryInteractEvent, val clickType: ClickType, val slot: Char, val builder: Chest) {
 
     val clicker: Player
         get() = bukkitEvent.whoClicked as Player

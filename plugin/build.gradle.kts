@@ -11,9 +11,15 @@ val generatedYamlDir = File("$buildDir/generated")
 
 dependencies {
     implementation(project(":common-env"))
+    implementation(project(":common-script"))
+    implementation(project(":common"))
     implementation(project(":project:module-hook"))
-    implementation(project(":project:module-smtp"))
+ //   implementation(project(":project:module-smtp"))
     implementation(project(":project:module-common"))
+    implementation(project(":project:module-nms"))
+    implementation(project(":project:module-nms-util"))
+    implementation(project(":project:module-nms-carrier"))
+    implementation(project(":project:module-effect"))
 }
 
 tasks {
@@ -36,12 +42,15 @@ tasks {
         //exclude("kotlin/**")
 
         // 重定向 Kotlin
-        relocate("kotlin.", "kotlin${kotlinVersionNum}.") {
-            exclude("kotlin.Metadata")
-        }
+        //relocate("kotlin.", "kotlin${kotlinVersionNum}.") {
+            //exclude("kotlin.Metadata")
+        //}
 
         // luck
         relocate("me.lucko.jarrelocator","${rootProject.group}.libraries.relocator" )
+
+        // nbt
+        relocate("de.tr7zw.changeme.nbtapi","${rootProject.group}.libraries.nbt" )
 
         // asm
         relocate("org.objectweb.asm", "${rootProject.group}.libraries.asm")
@@ -51,16 +60,16 @@ tasks {
 
         // hikari
         relocate("com.zaxxer.hikari", "${rootProject.group}.libraries.zaxxer.hikari")
-        // slf4j
+        // slf4j ’hikari‘
         relocate("org.slf4j", "${rootProject.group}.libraries.org.slf4j")
 
-        // redis
+        // redis TODO("重新定向需要解决SMTP引擎类指向")
         relocate("redis.clients", "${rootProject.group}.libraries.redis.clients")
 
         // javax
-        relocate("javax.mail", "${rootProject.group}.libraries.javax.mail")
-        relocate("com.sun", "${rootProject.group}.libraries.com.sun")
-        relocate("javax.activation", "${rootProject.group}.libraries.javax.activation")
+        //relocate("javax.mail", "${rootProject.group}.libraries.javax.mail")
+        //relocate("com.sun", "${rootProject.group}.libraries.com.sun")
+        //relocate("javax.activation", "${rootProject.group}.libraries.javax.activation")
 
         classifier = null
     }

@@ -1,7 +1,7 @@
 package me.neon.libs.taboolib.lang.type
 
 import me.neon.libs.taboolib.lang.Type
-import me.neon.libs.utils.replaceWithOrder
+import me.neon.libs.util.replaceWithOrder
 import org.bukkit.command.CommandSender
 
 /**

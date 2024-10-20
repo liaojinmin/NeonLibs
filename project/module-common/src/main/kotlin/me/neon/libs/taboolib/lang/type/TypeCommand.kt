@@ -1,8 +1,8 @@
 package me.neon.libs.taboolib.lang.type
 
 import me.neon.libs.taboolib.lang.Type
-import me.neon.libs.utils.asList
-import me.neon.libs.utils.replaceWithOrder
+import me.neon.libs.util.asList
+import me.neon.libs.util.replaceWithOrder
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 
@@ -23,7 +23,7 @@ class TypeCommand : Type {
     }
 
     override fun send(sender: CommandSender, vararg args: Any) {
-        command?.forEach { Bukkit.dispatchCommand(Bukkit.getConsoleSender(), it.replace("@p", sender.name).translate(sender, *args).replaceWithOrder(*args)) }
+        command?.forEach { Bukkit.dispatchCommand(Bukkit.getConsoleSender(), it.replace("@p", sender.name).translate(sender, *args).replaceWithOrder('{', '}', *args)) }
     }
 
     override fun toString(): String {

@@ -8,6 +8,17 @@ rootProject.name = "NeonLibs"
 
 include("plugin")
 include("project:module-hook")
-include("project:module-smtp")
+//("project:module-smtp")
 include("project:module-common")
+include("project:module-nms")
+include("project:module-nms-util")
+include("project:module-nms-carrier")
+include("project:module-nms-data-serializer")
+include("project:module-nms-data-serializer:nms-data-serializer-12005")
+include("project:module-nms-data-serializer:nms-data-serializer-legacy")
+
+include("project:module-effect")
+include("common")
 include("common-env")
+include("common-data")
+include("common-script")

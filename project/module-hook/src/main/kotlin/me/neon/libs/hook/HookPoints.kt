@@ -17,7 +17,7 @@ class HookPoints: HookPlugin() {
     override fun getImpl(): HookPoints? {
         return try {
             if (pointsAPI != null) {
-                return this;
+                return this
             }
             if (checkHook("PlayerPoints") != null) {
                 pointsAPI = PlayerPointsAPI()

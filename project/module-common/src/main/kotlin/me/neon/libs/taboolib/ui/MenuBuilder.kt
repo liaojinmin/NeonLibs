@@ -1,9 +1,11 @@
 package me.neon.libs.taboolib.ui
 
+import me.neon.libs.util.giveItem
 import org.bukkit.Material
 import org.bukkit.entity.HumanEntity
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 
@@ -12,7 +14,9 @@ import org.bukkit.inventory.ItemStack
  * 构建一个菜单
  */
 inline fun <reified T : Menu> buildMenu(title: String = "chest", builder: T.() -> Unit): Inventory {
-    return T::class.java.getDeclaredConstructor(String::class.java).newInstance(title).also(builder).build()
+    val type = if (T::class.java.isInterface) Menu.getImplementation(T::class.java) else T::class.java
+    val instance = type.getDeclaredConstructor(String::class.java).newInstance(title) as T
+    return instance.also(builder).build()
 }
 
 /**
@@ -49,3 +53,8 @@ fun InventoryClickEvent.getAffectItems(): List<ItemStack> {
     }
     return items
 }
+
+/**
+ * 在页面关闭时返还物品
+ */
+fun InventoryCloseEvent.returnItems(slots: List<Int>) = slots.forEach { player.giveItem(inventory.getItem(it)) }

@@ -1,7 +1,7 @@
 package me.neon.libs.taboolib.lang.type
 
 import me.neon.libs.taboolib.lang.Type
-import me.neon.libs.utils.playSoundResource
+import me.neon.libs.util.playSoundResource
 import org.bukkit.Sound
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player

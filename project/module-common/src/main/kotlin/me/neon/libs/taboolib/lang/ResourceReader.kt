@@ -2,12 +2,16 @@
 
 package me.neon.libs.taboolib.lang
 
+import me.neon.libs.NeonLibsLoader
 import me.neon.libs.taboolib.lang.type.TypeText
 import me.neon.libs.taboolib.lang.type.TypeList
-import me.neon.libs.utils.warning
+import me.neon.libs.util.YamlDsl
+import me.neon.libs.util.asyncRunner
+import org.bukkit.configuration.Configuration
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.Plugin
+import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.jar.JarFile
@@ -47,13 +51,13 @@ class ResourceReader(private val plugin: Plugin, pluginFile: File) {
                     // 加载文件
                     loadNodes(YamlConfiguration.loadConfiguration(file), exists, code)
                     // 检查缺失
-                    // val missingKeys = nodes.keys.filter { !exists.containsKey(it) }
-                    /*
-                    if (missingKeys.isNotEmpty() && migrate) {
+                    val missingKeys = nodes.keys.filter { a -> !exists.containsKey(a) }
+
+                    if (missingKeys.isNotEmpty()) {
                         // 更新文件
                         migrateFile(missingKeys, sourceFile, file)
                     }
-                     */
+
                     nodes += exists
                     files[code] = LanguageFile(file, nodes).also { f ->
                         files[code] = f
@@ -101,33 +105,34 @@ class ResourceReader(private val plugin: Plugin, pluginFile: File) {
             if (typeInstance != null) {
                 typeInstance.init(map)
             } else {
-                warning("Unsupported language type: $node > $type ($code)")
+               NeonLibsLoader.warning("Unsupported language type: $node > $type ($code)")
             }
             typeInstance
         } else {
-            warning("Missing language type: $map ($code)")
+            NeonLibsLoader.warning("Missing language type: $map ($code)")
             null
         }
     }
 
-    /*
+
     @Suppress("DEPRECATION")
     private fun migrateFile(missing: List<String>, source: Configuration, file: File) {
         asyncRunner {
+            //println("更新语言文件 -> $file")
             val append = ArrayList<String>()
             append += "# ------------------------- #"
-            append += "#  UPDATE ${dateFormat.format(System.currentTimeMillis())}  #"
+            append += "#  UPDATE ${Language.dateFormat.format(System.currentTimeMillis())}  #"
             append += "# ------------------------- #"
             append += ""
+
             missing.forEach { key ->
                 val obj = source[key]
                 if (obj != null) {
-                    append += SecuredFile.dumpAll(key, obj)
+                    append += YamlDsl.dumpAll(key, obj)
                 }
             }
             file.appendText("\n${append.joinToString("\n")}")
         }
     }
 
-     */
 }

@@ -2,11 +2,11 @@ package me.neon.libs.taboolib.lang.type
 
 import me.neon.libs.taboolib.chat.HexColor.parseToHexColor
 import me.neon.libs.taboolib.chat.HexColor.toGradientColor
-import me.neon.libs.utils.asList
-import me.neon.libs.utils.replaceWithOrder
 import me.neon.libs.taboolib.chat.RawMessage
 import me.neon.libs.taboolib.lang.Type
-import me.neon.libs.taboolib.lang.VariableReader
+import me.neon.libs.util.VariableReader
+import me.neon.libs.util.asList
+import me.neon.libs.util.replaceWithOrder
 import org.bukkit.command.CommandSender
 
 /**

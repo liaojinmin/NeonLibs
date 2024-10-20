@@ -1,13 +1,16 @@
 package me.neon.libs.taboolib.ui
 
 import me.neon.libs.NeonLibsLoader
-import me.neon.libs.utils.io.asyncRunner
+import me.neon.libs.core.LifeCycle
+import me.neon.libs.core.inject.Awake
+import me.neon.libs.event.SubscribeEvent
+import me.neon.libs.taboolib.ui.type.impl.ChestImpl
+import me.neon.libs.util.asyncRunner
+import me.neon.libs.util.setMeta
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
@@ -16,7 +19,6 @@ import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.util.Vector
 import java.util.*
 import java.util.stream.IntStream
@@ -24,13 +26,23 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-internal class ClickListener: Listener {
+internal object ClickListener {
 
-    @EventHandler
+    @Awake(LifeCycle.DISABLE)
+    fun onDisable() {
+        //关闭已打开的界面
+        Bukkit.getOnlinePlayers().forEach { it: Player ->
+            if (MenuHolder.fromInventory(it.openInventory.topInventory) != null) {
+                it.closeInventory()
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onOpen(e: InventoryOpenEvent) {
-        val builder = MenuHolder.fromInventory(e.inventory) ?: return
+        val builder = MenuHolder.fromInventory(e.inventory) as? ChestImpl ?: return
         // 构建回调
-        Bukkit.getScheduler().runTask(NeonLibsLoader.instance, Runnable {
+        Bukkit.getScheduler().runTask(NeonLibsLoader.getInstance(), Runnable {
             builder.buildCallback(e.player as Player, e.inventory)
             builder.selfBuildCallback(e.player as Player, e.inventory)
         })
@@ -42,9 +54,9 @@ internal class ClickListener: Listener {
     }
 
 
-    @EventHandler
+    @SubscribeEvent
     fun onClick(e: InventoryClickEvent) {
-        val builder = MenuHolder.fromInventory(e.inventory) ?: return
+        val builder = MenuHolder.fromInventory(e.inventory) as? ChestImpl ?: return
         // 锁定主手
         if (builder.handLocked && (e.rawSlot - e.inventory.size - 27 == e.whoClicked.inventory.heldItemSlot || e.click == org.bukkit.event.inventory.ClickType.NUMBER_KEY && e.hotbarButton == e.whoClicked.inventory.heldItemSlot)) {
             e.isCancelled = true
@@ -65,7 +77,7 @@ internal class ClickListener: Listener {
         if ((e.currentItem?.type != Material.AIR) && e.click == org.bukkit.event.inventory.ClickType.DROP) {
             val item = itemDrop(e.whoClicked as Player, e.currentItem)
             item.pickupDelay = 20
-            item.setMetadata("internal-drop", FixedMetadataValue(NeonLibsLoader.instance, true))
+            item.setMeta("internal-drop", true)
             val event = PlayerDropItemEvent((e.whoClicked as Player), item)
             Bukkit.getPluginManager().callEvent(event)
             if (event.isCancelled) {
@@ -77,7 +89,7 @@ internal class ClickListener: Listener {
         } else if (e.cursor?.type != Material.AIR && e.rawSlot == -999) {
             val item = itemDrop(e.whoClicked as Player, e.cursor)
             item.pickupDelay = 20
-            item.setMetadata("internal-drop", FixedMetadataValue(NeonLibsLoader.instance, true))
+            item.setMeta("internal-drop", true)
             val event = PlayerDropItemEvent((e.whoClicked as Player), item)
             Bukkit.getPluginManager().callEvent(event)
             if (event.isCancelled) {
@@ -89,20 +101,19 @@ internal class ClickListener: Listener {
         }
     }
 
-    @EventHandler
+    @SubscribeEvent
     fun onDrag(e: InventoryDragEvent) {
-        val menu = MenuHolder.fromInventory(e.inventory) ?: return
+        val menu = MenuHolder.fromInventory(e.inventory) as? ChestImpl ?: return
         val clickEvent = ClickEvent(e, ClickType.DRAG, ' ', menu)
         menu.clickCallback.forEach { it.invoke(clickEvent) }
         menu.selfClickCallback(clickEvent)
     }
 
-
-    @EventHandler
+    @SubscribeEvent
     fun onClose(e: InventoryCloseEvent) {
-        val menu = MenuHolder.fromInventory(e.inventory) ?: return
+        val menu = MenuHolder.fromInventory(e.inventory) as? ChestImpl ?: return
         // 标题更新 && 跳过关闭回调
-        if (menu.isUpdateTitle && menu.skipCloseCallbackOnUpdateTitle) {
+        if (menu.isUpdateTitle && menu.isSkipCloseCallbackOnUpdateTitle) {
             return
         }
         menu.closeCallback.invoke(e)
@@ -113,7 +124,7 @@ internal class ClickListener: Listener {
     }
 
 
-    @EventHandler
+    @SubscribeEvent
     fun onDropItem(e: PlayerDropItemEvent) {
         val builder = MenuHolder.fromInventory(e.player.openInventory.topInventory) ?: return
         if (builder.handLocked && !e.itemDrop.hasMetadata("internal-drop")) {
@@ -122,7 +133,7 @@ internal class ClickListener: Listener {
     }
 
 
-    @EventHandler
+    @SubscribeEvent
     fun onItemHeld(e: PlayerItemHeldEvent) {
         val builder = MenuHolder.fromInventory(e.player.openInventory.topInventory) ?: return
         if (builder.handLocked) {
@@ -131,7 +142,7 @@ internal class ClickListener: Listener {
     }
 
 
-    @EventHandler
+    @SubscribeEvent
     fun onSwap(e: PlayerSwapHandItemsEvent) {
         val builder = MenuHolder.fromInventory(e.player.openInventory.topInventory) ?: return
         if (builder.handLocked) {
@@ -139,7 +150,7 @@ internal class ClickListener: Listener {
         }
     }
 
-    fun itemDrop(player: Player, itemStack: ItemStack?, bulletSpread: Double = 0.0, radius: Double = 0.4): Item {
+    private fun itemDrop(player: Player, itemStack: ItemStack?, bulletSpread: Double = 0.0, radius: Double = 0.4): Item {
         val location = player.location.add(0.0, 1.5, 0.0)
         val item = player.world.dropItem(location, itemStack!!)
         val yaw = Math.toRadians((-player.location.yaw - 90.0f).toDouble())
