@@ -42,6 +42,7 @@ internal object ClickListener {
     fun onOpen(e: InventoryOpenEvent) {
         val builder = MenuHolder.fromInventory(e.inventory) as? ChestImpl ?: return
         // 构建回调
+
         Bukkit.getScheduler().runTask(NeonLibsLoader.getInstance(), Runnable {
             builder.buildCallback(e.player as Player, e.inventory)
             builder.selfBuildCallback(e.player as Player, e.inventory)

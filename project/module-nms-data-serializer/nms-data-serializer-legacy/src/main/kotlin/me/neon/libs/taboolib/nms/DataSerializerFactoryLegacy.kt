@@ -8,6 +8,7 @@ import net.minecraft.nbt.DynamicOpsNBT
 import net.minecraft.nbt.NBTCompressedStreamTools
 import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.IChatBaseComponent
+import net.minecraft.server.v1_16_R3.DataWatcher
 import net.minecraft.server.v1_16_R3.PacketDataSerializer
 import java.io.DataOutput
 
@@ -18,7 +19,9 @@ import java.io.DataOutput
  * @author 坏黑
  * @since 2022/12/12 23:30
  */
-class DataSerializerFactoryLegacy(val buf: PacketDataSerializer) : DataSerializerFactory, DataSerializer {
+class DataSerializerFactoryLegacy(private val buf: PacketDataSerializer) : DataSerializerFactory, DataSerializer {
+
+    constructor() : this(PacketDataSerializer(Unpooled.buffer()))
 
     override fun writeByte(byte: Byte): DataSerializer {
         return buf.writeByte(byte.toInt()).let { this }
@@ -50,6 +53,10 @@ class DataSerializerFactoryLegacy(val buf: PacketDataSerializer) : DataSerialize
 
     override fun writeBoolean(boolean: Boolean): DataSerializer {
         return buf.writeBoolean(boolean).let { this }
+    }
+
+    override fun writeMetadata(meta: List<Any>): DataSerializer {
+        return DataWatcher.a(meta.map { it } as List<DataWatcher.Item<*>>, buf).let { this }
     }
 
     override fun writeComponent(json: String): DataSerializer {

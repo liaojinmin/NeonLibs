@@ -22,8 +22,8 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
- * NeonDesire
- * me.neon.desire.nms
+ * NeonLibs
+ * me.neon.libs.nms
  *
  * @author 老廖
  * @since 2024/4/27 8:48

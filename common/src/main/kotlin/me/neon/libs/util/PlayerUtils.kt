@@ -30,7 +30,8 @@ fun HumanEntity.getEmptySlot(hasEquipment: Boolean = false, isItemAmount: Boolea
         if (itemStack == null || itemStack.type == Material.AIR) { air++ }
     }
     if (hasEquipment) {
-        if (inventory.itemInOffHand.type == Material.AIR) air--
+
+        if (inventory.itemInOffHand == null || inventory.itemInOffHand.type == Material.AIR) air--
         if (inventory.helmet == null) air--
         if (inventory.chestplate == null) air--
         if (inventory.leggings == null) air--

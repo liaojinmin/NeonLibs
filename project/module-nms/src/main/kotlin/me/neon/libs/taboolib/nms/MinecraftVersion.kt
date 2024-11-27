@@ -161,6 +161,27 @@ object MinecraftVersion {
             ).exchange(Exchanges.MAPPING_SPIGOT)
         }
     }
+        /*
+        .also {
+        println("spigotMapping >>>>>>>>>>>>>>")
+        println("classMapSpigotS2F:")
+        it.value.classMapSpigotS2F.forEach {
+            println("KEY: ${it.key}")
+            println("VALUE: ${it.value}")
+        }
+        println("classMapSpigotToMojang:")
+        it.value.classMapSpigotToMojang.forEach {
+            println("KEY: ${it.key}")
+            println("VALUE: ${it.value}")
+        }
+        println("classMapMojangToSpigot:")
+        it.value.classMapMojangToSpigot.forEach {
+            println("KEY: ${it.key}")
+            println("VALUE: ${it.value}")
+        }
+    }
+
+         */
 
     /**
      * 当前运行版本的 Paper 映射文件
@@ -192,7 +213,27 @@ object MinecraftVersion {
         } else {
             Mapping.paper().exchange(Exchanges.MAPPING_PAPER)
         }
+    }/*
+        .also {
+        println("paperMapping >>>>>>>>>>>>>>")
+        println("classMapSpigotS2F:")
+        it.value.classMapSpigotS2F.forEach {
+            println("KEY: ${it.key}")
+            println("VALUE: ${it.value}")
+        }
+        println("classMapSpigotToMojang:")
+        it.value.classMapSpigotToMojang.forEach {
+            println("KEY: ${it.key}")
+            println("VALUE: ${it.value}")
+        }
+        println("classMapMojangToSpigot:")
+        it.value.classMapMojangToSpigot.forEach {
+            println("KEY: ${it.key}")
+            println("VALUE: ${it.value}")
+        }
     }
+   */
+
 
     /**
      * 是否高于某个版本，使用方式如下：

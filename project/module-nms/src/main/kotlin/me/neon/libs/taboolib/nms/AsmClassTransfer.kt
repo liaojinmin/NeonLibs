@@ -28,7 +28,11 @@ class AsmClassTransfer(val plugin: Plugin, val source: String) {
         }
         val classReader = ClassReader(inputStream)
         val classWriter = ClassWriter(ClassWriter.COMPUTE_MAXS)
-        val remapper = if (MinecraftVersion.isUniversalCraftBukkit) { RemapTranslation() } else RemapTranslationLegacy()
+        val remapper = if (MinecraftVersion.isUniversalCraftBukkit) {
+            RemapTranslation()
+        } else {
+            RemapTranslationLegacy()
+        }
         classReader.accept(ClassRemapper(classWriter, remapper), 0)
         return mapCache.computeIfAbsent(plugin) { AsmClassLoader(plugin) }.createNewClass(source, classWriter.toByteArray())
       //  return AsmClassLoader.createNewClass(source, plugin, classWriter.toByteArray())

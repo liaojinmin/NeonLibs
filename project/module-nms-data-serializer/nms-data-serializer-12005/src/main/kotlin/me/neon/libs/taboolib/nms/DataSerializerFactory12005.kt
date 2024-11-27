@@ -3,8 +3,10 @@ package me.neon.libs.taboolib.nms
 import io.netty.buffer.ByteBufOutputStream
 import io.netty.buffer.Unpooled
 import net.minecraft.core.IRegistryCustom
+import net.minecraft.network.PacketDataSerializer
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.chat.ComponentSerialization
+import net.minecraft.network.syncher.DataWatcher
 import org.bukkit.craftbukkit.v1_21_R1.util.CraftChatMessage
 import java.io.DataOutput
 
@@ -15,7 +17,9 @@ import java.io.DataOutput
  * @author 坏黑
  * @since 2022/12/12 23:30
  */
-class DataSerializerFactory12005(val buf: RegistryFriendlyByteBuf) : DataSerializerFactory, DataSerializer {
+class DataSerializerFactory12005(private val buf: RegistryFriendlyByteBuf) : DataSerializerFactory, DataSerializer {
+
+    constructor() : this(RegistryFriendlyByteBuf(Unpooled.buffer(), IRegistryCustom.EMPTY))
 
     override fun writeByte(byte: Byte): DataSerializer {
         return buf.writeByte(byte.toInt()).let { this }
@@ -47,6 +51,11 @@ class DataSerializerFactory12005(val buf: RegistryFriendlyByteBuf) : DataSeriali
 
     override fun writeBoolean(boolean: Boolean): DataSerializer {
         return buf.writeBoolean(boolean).let { this }
+    }
+
+    override fun writeMetadata(meta: List<Any>): DataSerializer {
+        TODO()
+        //return DataWatcher.a(meta.map { it} as List<DataWatcher.Item<*>>, buf as PacketDataSerializer).let { this }
     }
 
     override fun writeComponent(json: String): DataSerializer {

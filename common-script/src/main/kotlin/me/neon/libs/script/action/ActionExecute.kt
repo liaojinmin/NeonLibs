@@ -33,7 +33,7 @@ class ActionExecute(
 
 
     fun eval(): CompletableFuture<Boolean> {
-        //println("  try")
+       // println("  try")
         try {
             if (atomic.get()) return CompletableFuture.completedFuture(false)
             for (group in reacts) {

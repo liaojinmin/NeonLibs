@@ -62,7 +62,7 @@ import java.util.logging.Level;
  *
  * @author fren_gor
  */
-public abstract class LightInjector implements Closeable {
+public class LightInjector implements Closeable {
 
     private static final Class<?> SERVER_CLASS = getNMSClass("MinecraftServer", "server");
     private static final Class<?> SERVER_CONNECTION_CLASS = getNMSClass("ServerConnection", "server.network");
@@ -196,7 +196,23 @@ public abstract class LightInjector implements Closeable {
      * @return The packet to receive instead, or {@code null} if the packet should be cancelled.
      * 要接收的替代数据包，或者如果应取消该数据包，则返回 {@code null}。
      */
-    protected abstract @Nullable Object onPacketReceiveAsync(@Nullable Player sender, @NotNull Channel channel, @NotNull Object packet);
+    private @Nullable Object onPacketReceiveAsync(@Nullable Player sender, @NotNull Channel channel, @NotNull Object packet) {
+        if (sender != null) {
+            PacketReceiveEvent event = new PacketReceiveEvent(sender, new Packet(packet));
+            if (event.callIf()) {
+                return event.getPacket().getSource();
+            } else {
+                return null;
+            }
+        } else {
+            PacketReceiveEvent.Handshake event = new PacketReceiveEvent.Handshake(channel, new Packet(packet));
+            if (event.callIf()) {
+                return event.getPacket().getSource();
+            } else {
+                return null;
+            }
+        }
+    }
 
     /**
      * Called asynchronously (i.e. not from main thread) when a packet is sent to a {@link Player}.
@@ -211,7 +227,24 @@ public abstract class LightInjector implements Closeable {
      * @return The packet to send instead, or {@code null} if the packet should be cancelled.
      * 要发送的替代数据包，或者如果应取消该数据包，则返回 {@code null}。
      */
-    protected abstract @Nullable Object onPacketSendAsync(@Nullable Player receiver, @NotNull Channel channel, @NotNull Object packet);
+    private @Nullable Object onPacketSendAsync(@Nullable Player receiver, @NotNull Channel channel, @NotNull Object packet) {
+        if (receiver != null) {
+            PacketSendEvent event = new PacketSendEvent(receiver, new Packet(packet));
+            if (event.callIf()) {
+                return event.getPacket().getSource();
+            } else {
+                return null;
+            }
+        } else {
+            PacketSendEvent.Handshake event = new PacketSendEvent.Handshake(channel, new Packet(packet));
+            if (event.callIf()) {
+                return event.getPacket().getSource();
+            } else {
+                return null;
+            }
+        }
+
+    }
 
     /**
      * Sends a packet to a player. Since the packet will be sent without any special treatment, this will invoke
@@ -433,7 +466,7 @@ public abstract class LightInjector implements Closeable {
         }
     }
 
-    private Channel getChannel(Player player) {
+    public Channel getChannel(Player player) {
         return getChannel(getNetworkManager(player));
     }
 

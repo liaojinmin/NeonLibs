@@ -55,13 +55,33 @@ open class RemapTranslation : Remapper() {
                 // 先转为 Spigot.FullName
                 var spigotName = MinecraftVersion.spigotMapping.classMapSpigotS2F[key.substringAfterLast('/')] ?: return key
                 // 如果为 Universal CraftBukkit 环境, 则应进一步转译为 Mojang.FullName
-                spigotName = if (MinecraftVersion.isUniversalCraftBukkit) MinecraftVersion.paperMapping.classMapSpigotToMojang[spigotName] ?: spigotName else spigotName
+                spigotName = if (MinecraftVersion.isUniversalCraftBukkit) {
+                    MinecraftVersion.paperMapping.classMapSpigotToMojang[spigotName] ?: spigotName
+                } else spigotName
                 spigotName.replace('.', '/')
             } else {
                 key
             }
         } else {
-            key.replace(nms1, nms2)
+            // 将高版本包名替换为低版本包名
+            // net/minecraft/server/level/EntityPlayer -> net/minecraft/server/v1_17_R1/EntityPlayer
+            val clazz = key.substringAfterLast('/', "")
+            if (clazz.isEmpty() || clazz.isBlank()) {
+                key.replace(nms1, nms2)
+            } else {
+                if (key.startsWith("net/minecraft")) {
+                    (MinecraftVersion.paperMapping.classMapSpigotS2F[clazz]
+                        ?: MinecraftVersion.spigotMapping.classMapSpigotS2F[clazz])?.let {
+                       // println("")
+                       // println("截取后类名: $clazz")
+                       // println("旧的包名: $key")
+                       // println("取得新包名: $it")
+                       //println( "重置: ${"net/minecraft/server/${MinecraftVersion.minecraftVersion}/${key.substringAfterLast( '/', "" )}"}")
+                        //println("")
+                        "net/minecraft/server/${MinecraftVersion.minecraftVersion}/${key.substringAfterLast('/', "")}"
+                    } ?: key.replace(nms1, nms2)
+                } else key
+            }
         }
     }
 

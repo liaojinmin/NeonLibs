@@ -3,6 +3,8 @@ package me.neon.libs.taboolib.nms
 import com.google.common.base.Charsets
 import com.google.common.collect.ForwardingMultimap
 import io.netty.handler.codec.EncoderException
+import net.minecraft.server.v1_16_R3.DataWatcher
+import net.minecraft.server.v1_16_R3.PacketDataSerializer
 import org.tabooproject.reflex.Reflex.Companion.getProperty
 import java.io.DataOutput
 import java.util.*
@@ -31,6 +33,8 @@ interface DataSerializer {
     fun writeDouble(double: Double): DataSerializer
 
     fun writeBoolean(boolean: Boolean): DataSerializer
+
+    fun writeMetadata(meta: List<Any>): DataSerializer
 
     fun writeUUID(uuid: UUID): DataSerializer {
         writeLong(uuid.mostSignificantBits)

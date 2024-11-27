@@ -57,6 +57,27 @@ inline fun <reified T> nmsProxy(plugin: Plugin, bind: String = "{name}Impl", var
     return nmsProxy(T::class.java, plugin, bind, emptyList(), *parameter)
 }
 
+fun <T> createInstance(clazz: Class<T>, parameters: Array<out Any>): T {
+    // 遍历所有构造函数
+    val constructors = clazz.declaredConstructors
+    for (constructor in constructors) {
+        val parameterTypes = constructor.parameterTypes
+        if (parameterTypes.size != parameters.size) continue
+        var isMatch = true
+        for (i in parameterTypes.indices) {
+            if (!parameterTypes[i].isAssignableFrom(parameters[i].javaClass)) {
+                isMatch = false
+                break
+            }
+        }
+        if (isMatch) {
+            constructor.isAccessible = true
+            return constructor.newInstance(*parameters) as T
+        }
+    }
+    throw NoSuchMethodException("没有找到匹配的构造函数: ${clazz.name}")
+}
+
 @Suppress("UNCHECKED_CAST")
 @Synchronized
 fun <T> nmsProxy(clazz: Class<T>, plugin: Plugin, bind: String = "{name}Impl", parent: List<String> = emptyList(), vararg parameter: Any): T {
@@ -65,27 +86,6 @@ fun <T> nmsProxy(clazz: Class<T>, plugin: Plugin, bind: String = "{name}Impl", p
     val cache = nmsProxyInstanceMap.computeIfAbsent(plugin) { ConcurrentHashMap() }
     if (cache.containsKey(key)) {
         return cache[key] as T
-    }
-    // 获取合适的构造函数并创建实例
-    fun <T> createInstance(clazz: Class<T>, parameters: Array<out Any>): T {
-        // 遍历所有构造函数
-        val constructors = clazz.declaredConstructors
-        for (constructor in constructors) {
-            val parameterTypes = constructor.parameterTypes
-            if (parameterTypes.size != parameters.size) continue
-            var isMatch = true
-            for (i in parameterTypes.indices) {
-                if (!parameterTypes[i].isAssignableFrom(parameters[i].javaClass)) {
-                    isMatch = false
-                    break
-                }
-            }
-            if (isMatch) {
-                constructor.isAccessible = true
-                return constructor.newInstance(*parameters) as T
-            }
-        }
-        throw NoSuchMethodException("没有找到匹配的构造函数: ${clazz.name}")
     }
 
     // 获取代理类并实例化
@@ -105,10 +105,12 @@ fun <T> nmsProxyClass(clazz: Class<T>, plugin: Plugin, bind: String = "{name}Imp
 @Suppress("UNCHECKED_CAST")
 @Synchronized
 fun <T> nmsProxyClass(clazz: Class<T>, plugin: Plugin, bind: String = "{name}Impl"): Class<T> {
+    //println("nmsProxyClass by $bind")
     val key = "${clazz.name}:$bind"
     // 从缓存中获取
     val cache = nmsProxyClassMap.computeIfAbsent(plugin) { ConcurrentHashMap() }
     if (cache.containsKey(key)) {
+        //println("nmsProxyClass cache end")
         return cache[key] as Class<T>
     }
     // 生成代理类
@@ -127,6 +129,7 @@ fun <T> nmsProxyClass(clazz: Class<T>, plugin: Plugin, bind: String = "{name}Imp
     }
     // 缓存代理类
     cache[key] = newClass
+   // println("nmsProxyClass end")
     return newClass as Class<T>
 }
 

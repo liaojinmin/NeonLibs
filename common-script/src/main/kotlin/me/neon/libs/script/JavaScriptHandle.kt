@@ -80,7 +80,6 @@ object JavaScriptHandle {
         if (text.isEmpty() || TRUE.matches(text)) {
             true
         } else {
-            Bukkit.getServer().consoleSender.sendMessage()
             // 不使用 js 解析条件
             if (text.startsWith('*')) {
                 ConditionHandle.parseCondition(text)

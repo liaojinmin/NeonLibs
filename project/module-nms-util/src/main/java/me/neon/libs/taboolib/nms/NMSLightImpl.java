@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.tabooproject.reflex.AnalyseMode;
 import org.tabooproject.reflex.Reflex;
 
 import java.lang.reflect.Constructor;
@@ -19,7 +20,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static me.neon.libs.taboolib.nms.MinecraftServerUtilKt.nmsClass;
-import static me.neon.libs.taboolib.nms.MinecraftServerUtilKt.sendAsyncPacket;
 
 /**
  * TabooLib
@@ -103,16 +103,16 @@ public class NMSLightImpl extends NMSLight {
         Object world = ((CraftWorld) block.getWorld()).getHandle();
         Object position = new net.minecraft.server.v1_15_R1.BlockPosition(block.getX(), block.getY(), block.getZ());
         if (MinecraftVersion.INSTANCE.getMajor() >= 6) {
-            syncLight(((net.minecraft.server.v1_14_R1.WorldServer) world).getChunkProvider().getLightEngine(), lightEngine -> {
+            syncLight(((WorldServer) world).getChunkProvider().getLightEngine(), lightEngine -> {
                 if (lightType == LightType.BLOCK) {
-                    Object lightEngineLayer = ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(net.minecraft.server.v1_14_R1.EnumSkyBlock.BLOCK);
+                    Object lightEngineLayer = ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.BLOCK);
                     setRawLightLevelBlock(level, position, lightEngineLayer);
                 } else if (lightType == LightType.SKY) {
-                    Object lightEngineLayer = ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(net.minecraft.server.v1_14_R1.EnumSkyBlock.SKY);
+                    Object lightEngineLayer = ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.SKY);
                     setRawLightLevelSky(level, position, lightEngineLayer);
                 } else {
-                    Object lightEngineLayer1 = ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(net.minecraft.server.v1_14_R1.EnumSkyBlock.BLOCK);
-                    Object lightEngineLayer2 = ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(net.minecraft.server.v1_14_R1.EnumSkyBlock.SKY);
+                    Object lightEngineLayer1 = ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.BLOCK);
+                    Object lightEngineLayer2 = ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.SKY);
                     setRawLightLevelBlock(level, position, lightEngineLayer1);
                     setRawLightLevelSky(level, position, lightEngineLayer2);
                 }
@@ -134,17 +134,17 @@ public class NMSLightImpl extends NMSLight {
         Object world = ((CraftWorld) block.getWorld()).getHandle();
         Object position = new net.minecraft.server.v1_15_R1.BlockPosition(block.getX(), block.getY(), block.getZ());
         if (MinecraftVersion.INSTANCE.getMajor() >= 9) {
-            Object lightEngine = ((net.minecraft.server.v1_14_R1.WorldServer) world).getChunkProvider().getLightEngine();
+            Object lightEngine = ((WorldServer) world).getChunkProvider().getLightEngine();
             // 类文件具有错误的版本 60.0, 应为 52.0
-            if ((boolean) Reflex.Companion.invokeMethod(lightEngine, "hasLightWork", new Object[0], false, true, true)) {
+            if ((boolean) Reflex.Companion.invokeMethod(lightEngine, "hasLightWork", new Object[0], false, true, true, AnalyseMode.ASM_FIRST)) {
                 syncLight(lightEngine, e -> {
                     if (lightType == LightType.BLOCK) {
-                        ((LightEngineLayer) ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(EnumSkyBlock.BLOCK)).a(Integer.MAX_VALUE, true, true);
+                        ((LightEngineLayer) ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.BLOCK)).a(Integer.MAX_VALUE, true, true);
                     } else if (lightType == LightType.SKY) {
-                        ((LightEngineLayer) ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(EnumSkyBlock.SKY)).a(Integer.MAX_VALUE, true, true);
+                        ((LightEngineLayer) ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.SKY)).a(Integer.MAX_VALUE, true, true);
                     } else {
-                        Object b = ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(EnumSkyBlock.BLOCK);
-                        Object s = ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(EnumSkyBlock.SKY);
+                        Object b = ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.BLOCK);
+                        Object s = ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.SKY);
                         int maxUpdateCount = Integer.MAX_VALUE;
                         int integer4 = maxUpdateCount / 2;
                         int integer5 = ((LightEngineLayer) b).a(integer4, true, true);
@@ -157,16 +157,16 @@ public class NMSLightImpl extends NMSLight {
                 });
             }
         } else if (MinecraftVersion.INSTANCE.getMajor() >= 6) {
-            Object lightEngine = ((net.minecraft.server.v1_14_R1.WorldServer) world).getChunkProvider().getLightEngine();
-            if (((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a()) {
+            Object lightEngine = ((WorldServer) world).getChunkProvider().getLightEngine();
+            if (((LightEngineThreaded) lightEngine).a()) {
                 syncLight(lightEngine, e -> {
                     if (lightType == LightType.BLOCK) {
-                        ((LightEngineLayer) ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(net.minecraft.server.v1_14_R1.EnumSkyBlock.BLOCK)).a(Integer.MAX_VALUE, true, true);
+                        ((LightEngineLayer) ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.BLOCK)).a(Integer.MAX_VALUE, true, true);
                     } else if (lightType == LightType.SKY) {
-                        ((LightEngineLayer) ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(net.minecraft.server.v1_14_R1.EnumSkyBlock.SKY)).a(Integer.MAX_VALUE, true, true);
+                        ((LightEngineLayer) ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.SKY)).a(Integer.MAX_VALUE, true, true);
                     } else {
-                        Object b = ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(net.minecraft.server.v1_14_R1.EnumSkyBlock.BLOCK);
-                        Object s = ((net.minecraft.server.v1_14_R1.LightEngineThreaded) lightEngine).a(net.minecraft.server.v1_14_R1.EnumSkyBlock.SKY);
+                        Object b = ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.BLOCK);
+                        Object s = ((LightEngineThreaded) lightEngine).a(EnumSkyBlock.SKY);
                         int maxUpdateCount = Integer.MAX_VALUE;
                         int integer4 = maxUpdateCount / 2;
                         int integer5 = ((LightEngineLayer) b).a(integer4, true, true);
@@ -221,11 +221,11 @@ public class NMSLightImpl extends NMSLight {
             Object chunk2 = ((net.minecraft.server.v1_8_R3.EntityPlayer) human).getWorld().getChunkAtWorldCoords(((net.minecraft.server.v1_8_R3.EntityPlayer) human).getChunkCoordinates());
             if (distance(chunk2, chunk1) < distance(human)) {
                 if (MinecraftVersion.INSTANCE.getMajor() >= 8) {
-                    sendAsyncPacket(player, new net.minecraft.server.v1_16_R1.PacketPlayOutLightUpdate(((net.minecraft.server.v1_16_R1.Chunk) chunk1).getPos(), ((net.minecraft.server.v1_16_R1.Chunk) chunk1).getWorld().getChunkProvider().getLightEngine(), true));
+                    ProtocolHandler.INSTANCE.sendPacket(player, new net.minecraft.server.v1_16_R1.PacketPlayOutLightUpdate(((net.minecraft.server.v1_16_R1.Chunk) chunk1).getPos(), ((net.minecraft.server.v1_16_R1.Chunk) chunk1).getWorld().getChunkProvider().getLightEngine(), true));
                 } else if (MinecraftVersion.INSTANCE.getMajor() >= 6) {
-                    sendAsyncPacket(player, new PacketPlayOutLightUpdate(((net.minecraft.server.v1_14_R1.Chunk) chunk1).getPos(), ((net.minecraft.server.v1_14_R1.Chunk) chunk1).e()));
+                    ProtocolHandler.INSTANCE.sendPacket(player, new PacketPlayOutLightUpdate(((net.minecraft.server.v1_14_R1.Chunk) chunk1).getPos(), ((net.minecraft.server.v1_14_R1.Chunk) chunk1).e()));
                 } else {
-                    sendAsyncPacket(player, new net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk((net.minecraft.server.v1_14_R1.Chunk) chunk1, 0x1ffff));
+                    ProtocolHandler.INSTANCE.sendPacket(player, new PacketPlayOutMapChunk((net.minecraft.server.v1_14_R1.Chunk) chunk1, 0x1ffff));
                 }
             }
         }
@@ -241,7 +241,7 @@ public class NMSLightImpl extends NMSLight {
             if (distance(chunk2, chunk1) < distance(human)) {
                 net.minecraft.server.v1_16_R1.IChunkProvider chunkProvider = ((net.minecraft.server.v1_16_R1.Chunk) chunk1).getWorld().getChunkProvider();
                 Object[] params = {net.minecraft.server.v1_16_R1.ChunkCoordIntPair.pair(chunk.getX(), chunk.getZ())};
-                net.minecraft.server.v1_16_R1.PlayerChunk playerChunk = Reflex.Companion.invokeMethod(chunkProvider, "getChunk", params, false, true, true);
+                net.minecraft.server.v1_16_R1.PlayerChunk playerChunk = Reflex.Companion.invokeMethod(chunkProvider, "getChunk", params, false, true, true, AnalyseMode.ASM_FIRST);
                 BitSet skyChangedLightSectionFilter = new BitSet();
                 BitSet blockChangedLightSectionFilter = new BitSet();
                 if (lightType == LightType.BLOCK) {
@@ -253,7 +253,7 @@ public class NMSLightImpl extends NMSLight {
                     skyChangedLightSectionFilter.set((block.getY() >> 4) + 1);
                 }
                 try {
-                    sendAsyncPacket(player, packetPlayOutLightUpdateConstructor.newInstance(
+                    ProtocolHandler.INSTANCE.sendPacket(player, packetPlayOutLightUpdateConstructor.newInstance(
                             ((net.minecraft.server.v1_16_R1.Chunk) chunk1).getPos(),
                             ((net.minecraft.server.v1_16_R1.Chunk) chunk1).getWorld().getChunkProvider().getLightEngine(),
                             skyChangedLightSectionFilter,
@@ -270,7 +270,7 @@ public class NMSLightImpl extends NMSLight {
     private int distance(Object player) {
         int viewDistance = Bukkit.getViewDistance();
         try {
-            int playerViewDistance = ((net.minecraft.server.v1_14_R1.EntityPlayer) player).clientViewDistance;
+            int playerViewDistance = ((EntityPlayer) player).clientViewDistance;
             if (playerViewDistance < viewDistance) {
                 viewDistance = playerViewDistance;
             }
@@ -311,11 +311,11 @@ public class NMSLightImpl extends NMSLight {
             Object b;
             AtomicInteger c;
             if (MinecraftVersion.INSTANCE.getMajor() >= 9) {
-                b = Reflex.Companion.getProperty(lightEngine, "taskMailbox", false, true, true);
-                c = Reflex.Companion.getProperty(b, "status", false, true, true);
+                b = Reflex.Companion.getProperty(lightEngine, "taskMailbox", false, true, true, AnalyseMode.ASM_FIRST);
+                c = Reflex.Companion.getProperty(b, "status", false, true, true, AnalyseMode.ASM_FIRST);
             } else {
-                b = Reflex.Companion.getProperty(lightEngine, "b", false, true, true);
-                c = Reflex.Companion.getProperty(b, "c", false, true, true);
+                b = Reflex.Companion.getProperty(lightEngine, "b", false, true, true, AnalyseMode.ASM_FIRST);
+                c = Reflex.Companion.getProperty(b, "c", false, true, true, AnalyseMode.ASM_FIRST);
             }
             int flags;
             long wait = -1L;
@@ -338,7 +338,7 @@ public class NMSLightImpl extends NMSLight {
             } finally {
                 while (!c.compareAndSet(flags = c.get(), flags & ~2)) {
                 }
-                Reflex.Companion.getProperty(b, "f", false, true, true);
+                Reflex.Companion.getProperty(b, "f", false, true, true, AnalyseMode.ASM_FIRST);
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -348,9 +348,9 @@ public class NMSLightImpl extends NMSLight {
     private void setRawLightLevelBlock(int level, Object position, Object lightEngineLayer) {
         if (level == 0) {
             ((LightEngineBlock) lightEngineLayer).a((BlockPosition) position);
-        } else if (((LightEngineLayer) lightEngineLayer).a(SectionPosition.a((net.minecraft.server.v1_14_R1.BlockPosition) position)) != null) {
+        } else if (((LightEngineLayer) lightEngineLayer).a(SectionPosition.a((BlockPosition) position)) != null) {
             try {
-                ((LightEngineLayer) lightEngineLayer).a((net.minecraft.server.v1_14_R1.BlockPosition) position, level);
+                ((LightEngineLayer) lightEngineLayer).a((BlockPosition) position, level);
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -360,21 +360,21 @@ public class NMSLightImpl extends NMSLight {
     private void setRawLightLevelSky(int level, Object position, Object lightEngineLayer) {
         if (level == 0) {
             ((LightEngineSky) lightEngineLayer).a((BlockPosition) position);
-        } else if (((LightEngineLayer) lightEngineLayer).a(SectionPosition.a((net.minecraft.server.v1_14_R1.BlockPosition) position)) != null) {
+        } else if (((LightEngineLayer) lightEngineLayer).a(SectionPosition.a((BlockPosition) position)) != null) {
             try {
                 if (MinecraftVersion.INSTANCE.getMajor() >= 9) {
-                    Object s = Reflex.Companion.getProperty(lightEngineLayer, "storage", false, true, true);
-                    Reflex.Companion.invokeMethod(s, "e", new Object[0], false, true, true);
+                    Object s = Reflex.Companion.getProperty(lightEngineLayer, "storage", false, true, true, AnalyseMode.ASM_FIRST);
+                    Reflex.Companion.invokeMethod(s, "e", new Object[0], false, true, true, AnalyseMode.ASM_FIRST);
                 } else {
-                    Object s = Reflex.Companion.getProperty(lightEngineLayer, "c", false, true, true);
+                    Object s = Reflex.Companion.getProperty(lightEngineLayer, "c", false, true, true, AnalyseMode.ASM_FIRST);
                     if (MinecraftVersion.INSTANCE.getMajor() >= 7) {
-                        Reflex.Companion.invokeMethod(s, "d", new Object[0], false, true, true);
+                        Reflex.Companion.invokeMethod(s, "d", new Object[0], false, true, true, AnalyseMode.ASM_FIRST);
                     } else {
-                        Reflex.Companion.invokeMethod(s, "c", new Object[0], false, true, true);
+                        Reflex.Companion.invokeMethod(s, "c", new Object[0], false, true, true, AnalyseMode.ASM_FIRST);
                     }
                 }
-                Object[] params = new Object[]{9223372036854775807L, ((net.minecraft.server.v1_14_R1.BlockPosition) position).asLong(), 15 - level, true};
-                Reflex.Companion.invokeMethod(lightEngineLayer, "a", params, false, true, true);
+                Object[] params = new Object[]{9223372036854775807L, ((BlockPosition) position).asLong(), 15 - level, true};
+                Reflex.Companion.invokeMethod(lightEngineLayer, "a", params, false, true, true, AnalyseMode.ASM_FIRST);
             } catch (Throwable t) {
                 t.printStackTrace();
             }
