@@ -78,6 +78,7 @@ object JavaScriptHandle {
     val conditionParser: (Player?, Event?, String, SimpleScriptContext?) -> Boolean = { player: Player?, event, text: String, context: SimpleScriptContext? ->
         //println("条件样式 $text")
         if (text.isEmpty() || TRUE.matches(text)) {
+            Bukkit.getServer().consoleSender.sendMessage()
             true
         } else {
             // 不使用 js 解析条件
