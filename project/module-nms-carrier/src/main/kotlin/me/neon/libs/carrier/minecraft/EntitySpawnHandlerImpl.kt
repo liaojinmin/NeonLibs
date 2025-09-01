@@ -5,9 +5,12 @@ import me.neon.libs.carrier.PacketHandler
 import me.neon.libs.taboolib.nms.MinecraftVersion
 import me.neon.libs.taboolib.nms.dataSerializerBuilder
 import me.neon.libs.taboolib.nms.sendAsyncPacket
+import me.neon.libs.util.unsafeLazy
 import org.bukkit.Location
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.tabooproject.reflex.UnsafeAccess
+import java.lang.invoke.MethodHandle
 import java.util.*
 
 /**
@@ -22,6 +25,12 @@ internal class EntitySpawnHandlerImpl: EntitySpawnHandler {
     private val major = MinecraftVersion.major
     private val majorLegacy = MinecraftVersion.majorLegacy
     private val minor = MinecraftVersion.minor
+
+    val livingDataWatcherSetterM: MethodHandle by unsafeLazy {
+        val field = NMS9PacketPlayOutSpawnEntityLiving::class.java.getDeclaredField("m")
+        field.isAccessible = true
+        UnsafeAccess.lookup.unreflectSetter(field)
+    }
 
     override fun spawnEntity(player: Player, entityType: EntityType, entityId: Int, uuid: UUID, location: Location, data: Int) {
         // 计算视角
@@ -129,7 +138,7 @@ internal class EntitySpawnHandlerImpl: EntitySpawnHandler {
 
     override fun spawnEntityLiving(player: Player, entityType: EntityType, entityId: Int, uuid: UUID, location: Location) {
         // 1.13 以下版本盔甲架子不是 EntityLiving 类型，1.19 以上版本所有实体使用 PacketPlayOutSpawnEntity 数据包生成
-        if ((entityType == EntityType.ARMOR_STAND && majorLegacy < 11300) || majorLegacy >= 11900) {
+        if (((entityType == EntityType.ARMOR_STAND || entityType == EntityType.ARROW) && majorLegacy < 11300) || majorLegacy >= 11900) {
             return spawnEntity(player, entityType, entityId, uuid, location)
         }
         // 计算视角
@@ -144,7 +153,6 @@ internal class EntitySpawnHandlerImpl: EntitySpawnHandler {
                     writeUUID(uuid)
                     // 1.13 以下版本使用 Bukkit 的实体 ID
                     if (major != 5) {
-                       // TODO()
                         writeVarInt(PacketHandler.entityOperatorHandler.createEntityType(entityType).toString().toInt())
                     } else {
                         // 1.13 使用 NMS 的实体 ID, 同时 1.13 版本的 IRegistry.ENTITY_TYPE 无法与 1.14, 1.15, 1.16 版本兼容
@@ -160,7 +168,7 @@ internal class EntitySpawnHandlerImpl: EntitySpawnHandler {
                     writeShort(0)
                     writeShort(0)
                     writeShort(0)
-                  //  NMS11DataWatcher(null).also { dw -> livingDataWatcherSetterM.bindTo(it).invokeWithArguments(dw) }.a(toNMS() as NMS11PacketDataSerializer)
+                    NMS11DataWatcher(null).also { dw -> livingDataWatcherSetterM.bindTo(it).invokeWithArguments(dw) }.a(build() as NMS11PacketDataSerializer)
                 }.build() as NMS11PacketDataSerializer)
             }
             // 1.14, 1.15, 1.16
@@ -179,6 +187,9 @@ internal class EntitySpawnHandlerImpl: EntitySpawnHandler {
                     writeShort(0)
                     writeShort(0)
                     writeShort(0)
+                    if (major != 8) {
+                        NMS14DataWatcher(null).also { dw -> livingDataWatcherSetterM.bindTo(it).invokeWithArguments(dw) }.a(build() as NMS14PacketDataSerializer)
+                    }
                 }.build() as NMS16PacketDataSerializer)
             }
             // 1.17, 1.18

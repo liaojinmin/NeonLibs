@@ -4,6 +4,7 @@ import me.neon.libs.carrier.minecraft.meta.ArmorStandMeta
 import me.neon.libs.carrier.minecraft.meta.CarrierMeta
 import me.neon.libs.taboolib.chat.HexColor.colored
 import me.neon.libs.util.BoundingBox
+import me.neon.libs.util.asyncRunner
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Entity
@@ -41,6 +42,8 @@ abstract class CarrierBase: MetaDatable<UUID> {
      */
     private val viewPlayer: MutableSet<String> = mutableSetOf()
 
+    private var oldViewPlayer: Set<String> = emptySet()
+
     /**
      * 载体的全息
      */
@@ -67,6 +70,24 @@ abstract class CarrierBase: MetaDatable<UUID> {
 
     private var parser: BiFunction<Player, String, String> = BiFunction { _, v -> v }
 
+    /**
+     * 是否挂起删除
+     */
+    private var waitRemovePacket: Boolean = false
+
+    /**
+     * 任务计时
+     */
+    private var tick: Int = 0
+
+    /**
+     * 存活时间
+     */
+    private var activeTimer: Long = 0
+
+    /**
+     * 全息偏移
+     */
     private var offset: Double = 0.0
 
     val entityId: Int by lazy { PacketHandler.nextIndex() }
@@ -74,6 +95,8 @@ abstract class CarrierBase: MetaDatable<UUID> {
     val uniqueId: UUID by lazy { UUID.randomUUID() }
 
     var visibleDistance: Double = 32.0
+
+    open val entityType: EntityType = EntityType.ARMOR_STAND
 
     var carrierMeta: CarrierMeta? = null
         set(value) {
@@ -86,13 +109,17 @@ abstract class CarrierBase: MetaDatable<UUID> {
 
     var isDead: Boolean = false
         set(value) {
+            if (value && field) return
             lock()
             field = value
+            if (value && activeTimer <= 2) {
+                waitRemovePacket = true
+                return
+            }
             //println("set isDead $field")
             if (!field) {
                 PacketHandler.addCarrier(this)
             } else {
-                // 此时已无容器缓存
                 PacketHandler.delCarrier(this)
                 getVisiblePlayers().forEach {
                     destroy(it)
@@ -103,6 +130,8 @@ abstract class CarrierBase: MetaDatable<UUID> {
         }
 
     open fun interact(player: Player, action: CarrierAction, isMainHand: Boolean) {}
+
+    open fun tick() {}
 
     fun teleport(loc: Location): CarrierBase {
         this.location.x = loc.x
@@ -167,7 +196,7 @@ abstract class CarrierBase: MetaDatable<UUID> {
 
     fun getVisiblePlayers(): List<Player> {
         val list = mutableListOf<Player>()
-        val iterator = viewPlayer.iterator()
+        val iterator = oldViewPlayer.iterator()
         while (iterator.hasNext()) {
             val player = Bukkit.getPlayerExact(iterator.next())
             if (player != null) {
@@ -224,9 +253,50 @@ abstract class CarrierBase: MetaDatable<UUID> {
         metadataList[uuid]?.remove(key)
     }
 
+    internal fun tickCarrier() {
+        if (tick > 20) {
+            tick = 0
+            activeTimer++
+        } else {
+            tick++
+            return
+        }
+        tick()
+        val iterator = viewPlayer.iterator()
+        while (iterator.hasNext()) {
+            val player = Bukkit.getPlayerExact(iterator.next())
+            if (player == null) {
+                iterator.remove()
+            }
+        }
+        if (waitRemovePacket) {
+            waitRemovePacket = false
+            asyncRunner(20) {
+                PacketHandler.delCarrier(this@CarrierBase)
+                getVisiblePlayers().forEach {
+                    destroy(it)
+                }
+                viewPlayer.clear()
+            }
+        }
+    }
+
+    internal fun refreshVisible(player: Player) {
+        if (isLock()) return
+
+        if (visibleByDistance(player)) {
+            refreshHologram(player)
+            spawn(player)
+        } else {
+            destroy(player)
+        }
+        oldViewPlayer = viewPlayer.toSet()
+    }
+
     private fun spawn(player: Player) {
         if (viewPlayer.add(player.name)) {
-            spawnArmorStand(player, location, displayName)
+            spawnEntityLiving(player, location, displayName, entityType)
+         //   spawnArmorStand(player, location, displayName)
             spawnHologram(player)
             entityMap.values.forEach{ it.spawn(player) }
             spawnFunction.forEach {
@@ -235,7 +305,7 @@ abstract class CarrierBase: MetaDatable<UUID> {
         }
     }
 
-    internal fun destroy(player: Player) {
+    private fun destroy(player: Player) {
         if (viewPlayer.remove(player.name)) {
             PacketHandler.entityOperatorHandler.destroyEntity(player, entityId)
             destroyHologram(player)
@@ -246,18 +316,19 @@ abstract class CarrierBase: MetaDatable<UUID> {
         }
     }
 
-    internal fun refreshVisible(player: Player) {
-        if (isLock()) return
-        if (visibleByDistance(player)) {
-            refreshHologram(player)
-            spawn(player)
-        } else {
-            destroy(player)
-        }
-    }
 
     private fun spawnArmorStand(target: Player, location: Location, name: String) {
         PacketHandler.entitySpawnHandler.spawnEntityLiving(target, EntityType.ARMOR_STAND, entityId, uniqueId, location)
+        if (carrierMeta != null) {
+            PacketHandler.entityOperatorHandler.sendEntityMetadata(target, entityId, carrierMeta!!)
+        }
+        if (name.isNotEmpty()) {
+            PacketHandler.entityOperatorHandler.sendCustomName(target, entityId, name, displayNameVisible)
+        }
+    }
+
+    private fun spawnEntityLiving(target: Player, location: Location, name: String, type: EntityType) {
+        PacketHandler.entitySpawnHandler.spawnEntityLiving(target, type, entityId, uniqueId, location)
         if (carrierMeta != null) {
             PacketHandler.entityOperatorHandler.sendEntityMetadata(target, entityId, carrierMeta!!)
         }

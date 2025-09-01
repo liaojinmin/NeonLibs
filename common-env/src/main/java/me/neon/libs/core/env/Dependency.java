@@ -65,6 +65,11 @@ public class Dependency extends AbstractXmlParser {
         return new URL(String.format("%s/%s/%s/%s/%s", repo.getUrl(), getGroupId().replace('.', '/'), getArtifactId(), getVersion(), name));
     }
 
+    public URL getURL2(Repository repo, String ext) throws MalformedURLException {
+        String name = String.format("%s-%s.%s", getArtifactId(), getVersion(), ext);
+        return new URL(String.format("%s/%s/%s/%s/%s", repo.getUrl(), getGroupId().replace('.', '/'), getArtifactId(), getVersion(), name));
+    }
+
     /**
      * 检查依赖项的版本
      * 如果版本尚未指定，则尝试从仓库中获取最新版本

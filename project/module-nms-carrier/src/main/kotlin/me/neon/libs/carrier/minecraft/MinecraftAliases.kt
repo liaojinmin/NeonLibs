@@ -9,6 +9,7 @@ typealias NMS9DataWatcherRegistry = net.minecraft.server.v1_9_R2.DataWatcherRegi
 typealias CraftItemStack9 = org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack
 typealias NMS9PacketPlayOutSpawnEntity = net.minecraft.server.v1_9_R2.PacketPlayOutSpawnEntity
 
+typealias NMS9PacketPlayOutSpawnEntityLiving = net.minecraft.server.v1_9_R2.PacketPlayOutSpawnEntityLiving
 // 1.11
 // carrierMeta
 typealias NMS11DataWatcherItem<T> = net.minecraft.server.v1_11_R1.DataWatcher.Item<T>
@@ -34,7 +35,7 @@ typealias NMS13EntityTypes<T> = net.minecraft.server.v1_13_R2.EntityTypes<T>
 typealias CraftItemStack13 = org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack
 typealias NMS13EnumItemSlot = net.minecraft.server.v1_13_R2.EnumItemSlot
 typealias NMS13PacketPlayOutEntityEquipment = net.minecraft.server.v1_13_R2.PacketPlayOutEntityEquipment
-
+typealias NMS14PacketDataSerializer = net.minecraft.server.v1_14_R1.PacketDataSerializer
 
 // 1.16
 // type
@@ -60,6 +61,7 @@ typealias NMS16PacketPlayOutEntityEquipment = net.minecraft.server.v1_16_R3.Pack
 typealias NMS16PacketPlayOutEntityMetadata = net.minecraft.server.v1_16_R1.PacketPlayOutEntityMetadata
 
 typealias NMS16IChatBaseComponent = net.minecraft.server.v1_16_R1.IChatBaseComponent
+typealias NMS14DataWatcher = net.minecraft.server.v1_14_R1.DataWatcher
 
 // 1.19
 typealias CraftItemStack19 = org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack

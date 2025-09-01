@@ -515,16 +515,16 @@ public class LightInjector implements Closeable {
                     for (int i = networkManagers.size() - 1; i >= 0; i--) {
                         Object networkManager = networkManagers.get(i);
                         injectNetworkManager(networkManager);
-                        NeonLibsLoader.info("[LightInjector] injectNetworkManager in RandomAccess");
+                     //   NeonLibsLoader.info("[LightInjector] injectNetworkManager in RandomAccess");
                     }
                 } else {
                     // Using standard foreach to avoid any potential performance issues
                     // (networkManagers should be an ArrayList, but we cannot be sure about that due to forks)
                     // 使用标准的 foreach 循环以避免任何潜在的性能问题
-                    //（networkManagers 应该是一个 ArrayList，但由于分叉我们不能确定这一点）
+                    //（networkManagers 应该是一个 ArrayList，但由于服务端分支不能确定这一点）
                     for (Object networkManager : networkManagers) {
                         injectNetworkManager(networkManager);
-                        NeonLibsLoader.info("[LightInjector] injectNetworkManager in else");
+                      //  NeonLibsLoader.info("[LightInjector] injectNetworkManager in else");
                     }
                 }
 

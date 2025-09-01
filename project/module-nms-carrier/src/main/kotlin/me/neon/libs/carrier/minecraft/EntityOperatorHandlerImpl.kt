@@ -137,7 +137,8 @@ internal class EntityOperatorHandlerImpl: EntityOperatorHandler {
 
     override fun createEntityType(entityType: EntityType): Any {
         if (MinecraftVersion.major < 5) {
-            return NMSEntityType.adapt(entityType).id
+           // return entityType.typeId
+           return NMSEntityType.adapt(entityType).id
         }
         val names = ArrayList<String>()
         names +=  if (entityType != EntityType.DROPPED_ITEM) entityType.name.uppercase() else "ITEM"

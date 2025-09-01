@@ -87,7 +87,6 @@ tasks {
         dependsOn(shadowJar)
     }
 
-
     project.publishing {
         publications {
             create<MavenPublication>("maven") {

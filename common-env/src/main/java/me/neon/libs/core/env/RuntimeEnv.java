@@ -3,8 +3,6 @@ package me.neon.libs.core.env;
 import me.neon.libs.core.ClassAppender;
 import me.neon.libs.core.PrimitiveIO;
 import org.jetbrains.annotations.NotNull;
-
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,18 +31,54 @@ public class RuntimeEnv {
 
     static void init() throws Throwable {
         // 检查 Kotlin 环境
-        if (PrimitiveIO.isKotlinEnvironment()) {
-            PrimitiveIO.println("已存在 Kotlin 环境集成...");
-            return;
-        }
-        // 如果包内的 Kotlin 未被加入类加载器，则下载。
-        PrimitiveIO.println("正在尝试下载 Kotlin 环境集成...");
-        //List<JarRelocation> rel = new ArrayList<>();
-        // 启用 Kotlin 重定向
-        //rel.add(new JarRelocation("!kotlin.","kotlin."));
+        if (!PrimitiveIO.isKotlinEnvironment()) {
+            // 如果包内的 Kotlin 未被加入类加载器，则下载。
+            PrimitiveIO.println("正在尝试下载 Kotlin 环境集成...");
+            // 启用 Kotlin 重定向
+            //rel.add(new JarRelocation("!kotlin.","kotlin."));
+            // 加载 Kotlin 环境
+            ENV.loadDependency("!org.jetbrains.kotlin:kotlin-stdlib:1.7.20", new ArrayList<>());
+        } else PrimitiveIO.println("已存在 Kotlin 环境集成...");
 
-        // 加载 Kotlin 环境
-        ENV.loadDependency("!org.jetbrains.kotlin:kotlin-stdlib:1.7.20", new ArrayList<>());
+      //  checkJnaVersion();
+
+     //   PrimitiveIO.println("正在尝试下载 byte-buddy 环境集成...");
+      //  ENV.loadDependency("!net.bytebuddy:byte-buddy:1.14.9", new ArrayList<>());
+       // ENV.loadDependency("!net.bytebuddy:byte-buddy-agent:1.14.9", new ArrayList<>());
+      //  ENV.loadDependency("!net.java.dev.jna:jna:5.17.0", Collections.emptyList());
+       // ENV.loadDependency("!net.java.dev.jna:jna-platform:5.17.0", Collections.emptyList());
+        // 主 ClassLoader 通过反射调用 helper
+       // Class<?> helperClass = IsolatedClassLoader.INSTANCE.loadClass("me.neon.libs.core.demo.BytebuddyLoader", true);
+      //  Object helper = helperClass.getDeclaredConstructor().newInstance();
+        //helperClass.getMethod("loader").invoke(helper);
+
+     //   BytebuddyLoader.loader();
+
+    }
+    public static void checkJnaVersion() {
+        try {
+            // 尝试获取 Native 类
+            Class<?> nativeClass = Class.forName("com.sun.jna.Native");
+            System.out.println("JNA 类加载器: " + nativeClass.getClassLoader());
+
+            // 打印类所在的 jar
+            String path = nativeClass.getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toString();
+            System.out.println("JNA 实际加载路径: " + path);
+
+            // 检查方法是否存在
+            try {
+                nativeClass.getMethod("load", String.class, Class.class, java.util.Map.class);
+                System.out.println("JNA 版本 >= 5.x（含 load(String, Class, Map) 方法）");
+            } catch (NoSuchMethodException e) {
+                System.out.println("JNA 版本 < 5.x（缺少 load(String, Class, Map) 方法）");
+            }
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("JNA 没有被加载");
+        }
     }
 
     public void inject(@NotNull Class<?> clazz) throws Throwable {
@@ -160,6 +194,9 @@ public class RuntimeEnv {
             @NotNull DependencyScope[] scope
     ) throws Throwable {
         String[] args = url.split(":");
+        if (url.startsWith("!")) {
+            args = url.replace("!", "").split(":");
+        }
         DependencyDownloader downloader = new DependencyDownloader(baseDir, relocation);
         // 支持用户对源进行替换
         if (repository.isEmpty()) {
@@ -177,9 +214,15 @@ public class RuntimeEnv {
         if (PrimitiveIO.validation(pomFile, pomFile1)) {
             downloader.loadDependencyFromInputStream(pomFile.toPath().toUri().toURL().openStream());
         } else {
-            String pom = String.format("%s/%s/%s/%s/%s-%s.pom", repository, args[0].replace('.', '/'), args[1], args[2], args[1], args[2]);
-            PrimitiveIO.println("正在下载 library %s:%s:%s %s", args[0], args[1], args[2], transitive ? "(transitive)" : "");
-            downloader.loadDependencyFromInputStream(new URL(pom).openStream());
+            try {
+                String pom = String.format("%s/%s/%s/%s/%s-%s.pom", repository, args[0].replace('.', '/'), args[1], args[2], args[1], args[2]);
+                PrimitiveIO.println("正在下载 library %s:%s:%s %s", args[0], args[1], args[2], transitive ? "(transitive)" : "");
+                downloader.loadDependencyFromInputStream(new URL(pom).openStream());
+            } catch (Exception e) {
+                String pom = String.format("%s/%s/%s/%s/%s-%s.pom", PrimitiveIO.REPO_CENTRAL_MAVEN, args[0].replace('.', '/'), args[1], args[2], args[1], args[2]);
+                PrimitiveIO.println("正在下载 library %s:%s:%s %s", args[0], args[1], args[2], transitive ? "(transitive)" : "");
+                downloader.loadDependencyFromInputStream(new URL(pom).openStream());
+            }
         }
         // 加载自身
         Dependency dep = new Dependency(args[0], args[1], args[2], DependencyScope.RUNTIME);

@@ -13,6 +13,9 @@ dependencies {
     //compileOnly("com.mojang:brigadier:1.0.18")
     // DataSerializer
     compileOnly("io.netty:netty-all:5.0.0.Alpha2")
+
+    compileOnly("org.tabooproject.reflex:reflex:1.1.6")
+    compileOnly("org.tabooproject.reflex:analyser:1.1.6")
 }
 
 tasks {

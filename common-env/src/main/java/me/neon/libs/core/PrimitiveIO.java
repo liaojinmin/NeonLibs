@@ -29,6 +29,8 @@ public class PrimitiveIO {
      */
     public static final String REPO_CENTRAL = "https://maven.aliyun.com/repository/central";
 
+    public static final String REPO_CENTRAL_MAVEN = "https://repo1.maven.org/maven2";
+
     private static final String runningFileName = "NeonLibs";
 
     private static final File libsFile = new File(System.getProperty("user.dir") + File.separator + "plugins" +File.separator + "NeonLibs", "libraries");

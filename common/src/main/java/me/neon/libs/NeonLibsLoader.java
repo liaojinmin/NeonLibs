@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -28,6 +29,7 @@ import java.util.logging.Logger;
                 value = "!org.openjdk.nashorn:nashorn-core:15.4",
                 test = "!jdk.nashorn.api.scripting.NashornScriptEngineFactory"
         )
+
 })
 public class NeonLibsLoader extends JavaPlugin {
 
@@ -78,7 +80,10 @@ public class NeonLibsLoader extends JavaPlugin {
     static {
         // 启动 IsolatedClassLoader
         IsolatedClassLoader.init(NeonLibsLoader.class);
+
+
     }
+
 
     public NeonLibsLoader() {
         instance = this;

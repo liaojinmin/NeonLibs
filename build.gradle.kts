@@ -18,6 +18,7 @@ subprojects {
         mavenLocal()
         mavenCentral()
         maven("https://libraries.minecraft.net")
+        maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         maven("https://maven.aliyun.com/repository/central")
         maven("https://oss.sonatype.org/content/repositories/snapshots")
         maven("https://repo.tabooproject.org/repository/releases")
@@ -39,19 +40,18 @@ subprojects {
         compileOnly("org.apache.commons:commons-lang3:3.5")
         compileOnly("redis.clients:jedis:4.2.2")
         compileOnly("com.zaxxer:HikariCP:4.0.3")
+        compileOnly("me.clip:placeholderapi:2.11.5")
         // server
         compileOnly("ink.ptms.core:v11604:11604")
-
         compileOnly("org.ow2.asm:asm:9.2")
         compileOnly("org.ow2.asm:asm-util:9.2")
         compileOnly("org.ow2.asm:asm-commons:9.2")
-        implementation("de.tr7zw:item-nbt-api:2.12.2")
-       // implementation("org.tabooproject.reflex:reflex:1.0.19")
-        //implementation("org.tabooproject.reflex:analyser:1.0.19")
-        implementation("org.tabooproject.reflex:reflex:1.1.6")
-        implementation("org.tabooproject.reflex:analyser:1.1.6")
-
+        compileOnly("net.bytebuddy:byte-buddy:1.14.9")
+        compileOnly("net.bytebuddy:byte-buddy-agent:1.14.9")
+        compileOnly("net.java.dev.jna:jna:5.17.0")
+        compileOnly("net.java.dev.jna:jna-platform:5.17.0")
         compileOnly("org.jetbrains:annotations:23.0.0")
+
 
     }
     java {

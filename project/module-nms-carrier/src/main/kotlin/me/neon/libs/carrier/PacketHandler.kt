@@ -118,6 +118,7 @@ object PacketHandler {
             val a = carrierCache.entries.iterator()
             while (a.hasNext()) {
                 val carrier = a.next().value
+                carrier.tickCarrier()
                 val player = onlinePlayers.listIterator()
                 while (player.hasNext()) {
                     val it = player.next()
@@ -163,7 +164,6 @@ object PacketHandler {
     @SubscribeEvent(priority = EventPriority.MONITOR)
     private fun quit(event: PlayerQuitEvent) {
         onlinePlayers.remove(event.player)
-        carrierCache.values.forEach { it.destroy(event.player) }
     }
 
     private fun callAction(e: PacketReceiveEvent): Pair<CarrierAction, Boolean> {
