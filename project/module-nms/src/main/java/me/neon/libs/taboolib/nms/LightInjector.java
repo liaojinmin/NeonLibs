@@ -1,24 +1,3 @@
-// MIT License
-//
-// Copyright (c) 2022 fren_gor
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
 
 package me.neon.libs.taboolib.nms;
 
@@ -62,7 +41,7 @@ import java.util.logging.Level;
  *
  * @author fren_gor
  */
-public class LightInjector implements Closeable {
+public abstract class LightInjector implements Closeable {
 
     private static final Class<?> SERVER_CLASS = getNMSClass("MinecraftServer", "server");
     private static final Class<?> SERVER_CONNECTION_CLASS = getNMSClass("ServerConnection", "server.network");
@@ -196,23 +175,7 @@ public class LightInjector implements Closeable {
      * @return The packet to receive instead, or {@code null} if the packet should be cancelled.
      * 要接收的替代数据包，或者如果应取消该数据包，则返回 {@code null}。
      */
-    private @Nullable Object onPacketReceiveAsync(@Nullable Player sender, @NotNull Channel channel, @NotNull Object packet) {
-        if (sender != null) {
-            PacketReceiveEvent event = new PacketReceiveEvent(sender, new Packet(packet));
-            if (event.callIf()) {
-                return event.getPacket().getSource();
-            } else {
-                return null;
-            }
-        } else {
-            PacketReceiveEvent.Handshake event = new PacketReceiveEvent.Handshake(channel, new Packet(packet));
-            if (event.callIf()) {
-                return event.getPacket().getSource();
-            } else {
-                return null;
-            }
-        }
-    }
+    protected abstract @Nullable Object onPacketReceiveAsync(@Nullable Player sender, @NotNull Channel channel, @NotNull Object packet);
 
     /**
      * Called asynchronously (i.e. not from main thread) when a packet is sent to a {@link Player}.
@@ -227,24 +190,7 @@ public class LightInjector implements Closeable {
      * @return The packet to send instead, or {@code null} if the packet should be cancelled.
      * 要发送的替代数据包，或者如果应取消该数据包，则返回 {@code null}。
      */
-    private @Nullable Object onPacketSendAsync(@Nullable Player receiver, @NotNull Channel channel, @NotNull Object packet) {
-        if (receiver != null) {
-            PacketSendEvent event = new PacketSendEvent(receiver, new Packet(packet));
-            if (event.callIf()) {
-                return event.getPacket().getSource();
-            } else {
-                return null;
-            }
-        } else {
-            PacketSendEvent.Handshake event = new PacketSendEvent.Handshake(channel, new Packet(packet));
-            if (event.callIf()) {
-                return event.getPacket().getSource();
-            } else {
-                return null;
-            }
-        }
-
-    }
+    protected abstract @Nullable Object onPacketSendAsync(@Nullable Player receiver, @NotNull Channel channel, @NotNull Object packet);
 
     /**
      * Sends a packet to a player. Since the packet will be sent without any special treatment, this will invoke
@@ -466,7 +412,7 @@ public class LightInjector implements Closeable {
         }
     }
 
-    public Channel getChannel(Player player) {
+    Channel getChannel(Player player) {
         return getChannel(getNetworkManager(player));
     }
 
@@ -484,7 +430,7 @@ public class LightInjector implements Closeable {
 
         @EventHandler(priority = EventPriority.LOWEST)
         private void onAsyncPlayerPreLoginEvent(AsyncPlayerPreLoginEvent event) {
-            NeonLibsLoader.info("[LightInjector] AsyncPlayerPreLoginEvent: "+event.getName());
+          //  PrimitiveIO.debug("[LightInjector] AsyncPlayerPreLoginEvent: {0}", event.getName());
             if (isClosed()) {
                 return;
             }
@@ -515,16 +461,16 @@ public class LightInjector implements Closeable {
                     for (int i = networkManagers.size() - 1; i >= 0; i--) {
                         Object networkManager = networkManagers.get(i);
                         injectNetworkManager(networkManager);
-                     //   NeonLibsLoader.info("[LightInjector] injectNetworkManager in RandomAccess");
+                      //  PrimitiveIO.println("[LightInjector] injectNetworkManager in RandomAccess");
                     }
                 } else {
                     // Using standard foreach to avoid any potential performance issues
                     // (networkManagers should be an ArrayList, but we cannot be sure about that due to forks)
                     // 使用标准的 foreach 循环以避免任何潜在的性能问题
-                    //（networkManagers 应该是一个 ArrayList，但由于服务端分支不能确定这一点）
+                    //（networkManagers 应该是一个 ArrayList，但由于分叉我们不能确定这一点）
                     for (Object networkManager : networkManagers) {
                         injectNetworkManager(networkManager);
-                      //  NeonLibsLoader.info("[LightInjector] injectNetworkManager in else");
+                      //  PrimitiveIO.debug("[LightInjector] injectNetworkManager in else");
                     }
                 }
 
@@ -537,7 +483,7 @@ public class LightInjector implements Closeable {
                     synchronized (pendingNetworkManagers) {
                         for (Object networkManager : pendingNetworkManagers) {
                             injectNetworkManager(networkManager);
-                            NeonLibsLoader.info("[LightInjector] injectNetworkManager in pendingNetworkManagers");
+                          //  PrimitiveIO.debug("[LightInjector] injectNetworkManager in pendingNetworkManagers");
                         }
                     }
                 }
@@ -676,7 +622,7 @@ public class LightInjector implements Closeable {
             clazz = "net.minecraft.server." + MinecraftVersion.INSTANCE.getMinecraftVersion() + '.' + name;
         }
         try {
-            return ClassHelper.getClass(clazz);
+            return NeonLibsLoader.classFinder.getClass(clazz);
         } catch (ClassNotFoundException exception) {
             throw new RuntimeException("[LightInjector] Cannot find NMS Class! (" + clazz + ')', exception);
         }
@@ -692,7 +638,7 @@ public class LightInjector implements Closeable {
             clazz = "org.bukkit.craftbukkit." + version + "." + name;
         }
         try {
-            return ClassHelper.getClass(clazz);
+            return NeonLibsLoader.classFinder.getClass(clazz);
         } catch (ClassNotFoundException exception) {
             throw new RuntimeException("[LightInjector] Cannot find CB Class! (" + clazz + ')', exception);
         }

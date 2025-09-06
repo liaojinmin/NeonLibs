@@ -1,5 +1,8 @@
 package me.neon.libs.taboolib.nms;
 
+import me.neon.libs.NeonLibsLoader;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -26,6 +29,38 @@ public class LightReflection {
             forName.setAccessible(true);
         } catch (Throwable ignored) {
         }
+    }
+
+    /**
+     * 由 "extra.properties" 启动，依赖加载后迅速接管 TabooLib 类查找器
+     */
+    static void init() {
+        NeonLibsLoader.classFinder = new NeonLibsLoader.ClassFinder() {
+
+            @Override
+            public @NotNull Class<?> findClass(@NotNull String s) {
+                try {
+                    return getClass(s);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public Class<?> getClass(String name) throws ClassNotFoundException {
+                return forName(name, true, NeonLibsLoader.class.getClassLoader());
+            }
+
+            @Override
+            public Class<?> getClass(String name, boolean initialize) throws ClassNotFoundException {
+                return forName(name, initialize, NeonLibsLoader.class.getClassLoader());
+            }
+
+            @Override
+            public Class<?> getClass(String name, boolean initialize, ClassLoader classLoader) throws ClassNotFoundException {
+                return forName(name, initialize, classLoader);
+            }
+        };
     }
 
     /**

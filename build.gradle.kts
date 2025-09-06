@@ -38,20 +38,29 @@ subprojects {
         compileOnly("com.google.guava:guava:21.0")
         compileOnly("com.google.code.gson:gson:2.8.7")
         compileOnly("org.apache.commons:commons-lang3:3.5")
-        compileOnly("redis.clients:jedis:4.2.2")
-        compileOnly("com.zaxxer:HikariCP:4.0.3")
-        compileOnly("me.clip:placeholderapi:2.11.5")
-        // server
-        compileOnly("ink.ptms.core:v11604:11604")
-        compileOnly("org.ow2.asm:asm:9.2")
-        compileOnly("org.ow2.asm:asm-util:9.2")
-        compileOnly("org.ow2.asm:asm-commons:9.2")
-        compileOnly("net.bytebuddy:byte-buddy:1.14.9")
-        compileOnly("net.bytebuddy:byte-buddy-agent:1.14.9")
-        compileOnly("net.java.dev.jna:jna:5.17.0")
-        compileOnly("net.java.dev.jna:jna-platform:5.17.0")
         compileOnly("org.jetbrains:annotations:23.0.0")
 
+        compileOnly("io.netty:netty-all:5.0.0.Alpha2") {
+            exclude(group = "org.ow2.asm")
+        }
+
+        compileOnly("com.zaxxer:HikariCP:4.0.3")
+        compileOnly("me.clip:placeholderapi:2.11.5")
+
+        compileOnly("de.tr7zw:item-nbt-api:2.15.2")
+
+        compileOnly("org.openjdk.nashorn:nashorn-core:15.4") {
+            exclude(group = "org.ow2.asm")
+        }
+
+        // server
+        compileOnly("ink.ptms.core:v11604:11604")
+        compileOnly("org.ow2.asm:asm:9.6")
+        compileOnly("org.ow2.asm:asm-util:9.6")
+        compileOnly("org.ow2.asm:asm-commons:9.6")
+
+        compileOnly("org.tabooproject.reflex:reflex:1.2.0")
+        compileOnly("org.tabooproject.reflex:analyser:1.2.0")
 
     }
     java {

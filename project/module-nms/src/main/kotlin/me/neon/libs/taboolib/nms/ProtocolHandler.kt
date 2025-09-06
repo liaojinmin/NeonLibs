@@ -65,10 +65,15 @@ object ProtocolHandler {
         return instance != null
     }
 
+    @Awake(LifeCycle.NONE)
+    fun none() {
+        println("none LightReflection init")
+        LightReflection.init()
+    }
     @Awake(LifeCycle.ENABLE)
     fun init() {
         instance?.close()
-        instance = LightInjector(NeonLibsLoader.getInstance())
+        instance = LightInjectorImpl(NeonLibsLoader.getInstance())
         Exchanges[PACKET_LISTENER] = "NeonLibs"
     }
 

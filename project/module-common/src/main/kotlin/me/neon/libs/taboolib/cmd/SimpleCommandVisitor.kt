@@ -42,8 +42,8 @@ class SimpleCommandVisitor: ClassVisitor(1) {
 
     override fun visitField(plugin: Plugin, field: ClassField, clazz: Class<*>, instance: Supplier<*>?) {
         if (field.isAnnotationPresent(CommandBody::class.java) && field.fieldType == SimpleCommandMain::class.java) {
-            //NeonLibsLoader.print("[" + plugin.name + "] 正在注册指令...")
-            //NeonLibsLoader.print("    类: $clazz 字段: ${field.name}")
+         //   NeonLibsLoader.print("[" + plugin.name + "] 正在注册指令...")
+          //  NeonLibsLoader.print("    类: $clazz 字段: ${field.name}")
             main.computeIfAbsent(plugin) {
                 HashMap()
             }.also {
@@ -71,9 +71,10 @@ class SimpleCommandVisitor: ClassVisitor(1) {
     }
 
     override fun visitEnd(plugin: Plugin, clazz: Class<*>, instance: Supplier<*>?) {
+       // NeonLibsLoader.print("class: $clazz")
         if (clazz.isAnnotationPresent(CommandHeader::class.java)) {
-            //NeonLibsLoader.print("[" + plugin.name + "] 正在注册指令...")
-            //NeonLibsLoader.print("    类: $clazz")
+            NeonLibsLoader.print("[" + plugin.name + "] 正在注册指令...")
+            NeonLibsLoader.print("    类: $clazz")
             val annotation = clazz.getAnnotation(CommandHeader::class.java)
             command(
                 plugin,

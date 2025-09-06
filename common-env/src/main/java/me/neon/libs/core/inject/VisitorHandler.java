@@ -48,6 +48,9 @@ public class VisitorHandler {
         for (Map.Entry<String, NavigableMap<Byte, VisitorGroup>> entry : propertyMap.entrySet()) {
             for (Map.Entry<Byte, VisitorGroup> entry2 : entry.getValue().entrySet()) {
                 for (Class<?> clazz : classes) {
+                   // if (plugin.getName().equalsIgnoreCase("NeonModel")) {
+                       // System.out.println("clazz: "+clazz);
+                //    }
                     inject(plugin, clazz, entry2.getValue(), lifeCycle);
                 }
             }
@@ -95,6 +98,7 @@ public class VisitorHandler {
             return;
         }
         // 依赖注入
+
         visitStart(plugin, clazz, group, lifeCycle, rc, instance);
         visitField(plugin, clazz, group, lifeCycle, rc, instance);
         visitMethod(plugin, clazz, group, lifeCycle, rc, instance);

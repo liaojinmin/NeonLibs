@@ -66,14 +66,6 @@ tasks {
         // slf4j ’hikari‘
         relocate("org.slf4j", "${rootProject.group}.libraries.org.slf4j")
 
-        // redis TODO("重新定向需要解决SMTP引擎类指向")
-        relocate("redis.clients", "${rootProject.group}.libraries.redis.clients")
-
-        // javax
-        //relocate("javax.mail", "${rootProject.group}.libraries.javax.mail")
-        //relocate("com.sun", "${rootProject.group}.libraries.com.sun")
-        //relocate("javax.activation", "${rootProject.group}.libraries.javax.activation")
-
         classifier = null
     }
 
@@ -117,6 +109,7 @@ tasks.register("generateYaml") {
             name: ${rootProject.name}
             version: ${project.version}
             main:  ${project.group}.NeonLibsLoader
+            load: STARTUP
             authors:
               - '老廖'
             softdepend:

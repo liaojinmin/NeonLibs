@@ -11,6 +11,9 @@ import me.neon.libs.util.RunnerDslKt;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.tabooproject.reflex.ClassAnalyser;
+
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +30,8 @@ import java.util.logging.Logger;
 @RuntimeDependencies({
         @RuntimeDependency(
                 value = "!org.openjdk.nashorn:nashorn-core:15.4",
-                test = "!jdk.nashorn.api.scripting.NashornScriptEngineFactory"
+                test = "!jdk.nashorn.api.scripting.NashornScriptEngineFactory",
+                transitive = false
         )
 
 })
@@ -76,6 +80,36 @@ public class NeonLibsLoader extends JavaPlugin {
     public static NeonLibsLoader getInstance() {
         return (NeonLibsLoader) instance;
     }
+
+    /**
+     * 类查找器
+     */
+    public static ClassFinder classFinder = new ClassFinder() {
+
+        @Override
+        public @NotNull Class<?> findClass(@NotNull String s) {
+            try {
+                return Class.forName(s);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public Class<?> getClass(String name) throws ClassNotFoundException {
+            return Class.forName(name);
+        }
+
+        @Override
+        public Class<?> getClass(String name, boolean initialize) throws ClassNotFoundException {
+            return Class.forName(name, initialize, NeonLibsLoader.class.getClassLoader());
+        }
+
+        @Override
+        public Class<?> getClass(String name, boolean initialize, ClassLoader classLoader) throws ClassNotFoundException {
+            return Class.forName(name, initialize, classLoader);
+        }
+    };
 
     static {
         // 启动 IsolatedClassLoader
@@ -162,5 +196,14 @@ public class NeonLibsLoader extends JavaPlugin {
     public void onDisable() {
         VisitorHandler.injectAll(this, LifeCycle.DISABLE, classes);
         registerPlugin.values().forEach(LifeCycleLoader::disableCall);
+    }
+
+    public static abstract class ClassFinder implements ClassAnalyser.ClassFinder {
+
+        public abstract Class<?> getClass(String name) throws ClassNotFoundException;
+
+        public abstract Class<?> getClass(String name, boolean initialize) throws ClassNotFoundException;
+
+        public abstract Class<?> getClass(String name, boolean initialize, ClassLoader classLoader) throws ClassNotFoundException;
     }
 }
