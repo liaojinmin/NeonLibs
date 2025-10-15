@@ -5,6 +5,7 @@ dependencies {
     compileOnly(project(":project:module-common"))
     // 服务端
    // compileOnly("net.md-5:bungeecord-chat:1.17")
+    compileOnly("ink.ptms.core:v11604:11604")
     compileOnly("ink.ptms:nms-all:1.0.0")
     compileOnly("ink.ptms.core:v12002:12002-minimize:mapped")
     compileOnly("ink.ptms.core:v12002:12002-minimize:universal")

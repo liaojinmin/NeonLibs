@@ -68,7 +68,6 @@ object Language {
         languageFile[plugin] = ResourceReader(plugin, pluginFile).files
     }
 
-
     /** 获取玩家语言 */
     fun getLocale(player: Player): String {
         return languageCodeTransfer[player.locale.lowercase()] ?: player.locale

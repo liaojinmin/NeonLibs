@@ -47,6 +47,8 @@ public abstract class ClassVisitor {
      */
     public void visitStart(@NotNull Plugin plugin, @NotNull Class<?> clazz, @Nullable Supplier<?> instance) {
     }
+    public void visitStart(@NotNull Class<?> clazz, @Nullable Supplier<?> instance) {
+    }
 
     /**
      * 当类结束加载时
@@ -55,6 +57,9 @@ public abstract class ClassVisitor {
      * @param instance 实例
      */
     public void visitEnd(@NotNull Plugin plugin, @NotNull Class<?> clazz, @Nullable Supplier<?> instance) {
+    }
+
+    public void visitEnd(@NotNull Class<?> clazz, @Nullable Supplier<?> instance) {
     }
 
     /**
@@ -67,6 +72,9 @@ public abstract class ClassVisitor {
     public void visitField(@NotNull Plugin plugin, @NotNull ClassField field, @NotNull Class<?> clazz, @Nullable Supplier<?> instance) {
     }
 
+    public void visitField(@NotNull ClassField field, @NotNull Class<?> clazz, @Nullable Supplier<?> instance) {
+    }
+
     /**
      * 当方法加载时
      *
@@ -75,6 +83,9 @@ public abstract class ClassVisitor {
      * @param instance 实例
      */
     public void visitMethod(@NotNull Plugin plugin, @NotNull ClassMethod method, @NotNull Class<?> clazz, @Nullable Supplier<?> instance) {
+    }
+
+    public void visitMethod(@NotNull ClassMethod method, @NotNull Class<?> clazz, @Nullable Supplier<?> instance) {
     }
 
     /**

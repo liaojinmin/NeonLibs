@@ -5,6 +5,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import me.neon.libs.NeonLibsLoader
 import me.neon.libs.util.getMetaFirstOrNull
 import me.neon.libs.util.hasMeta
 import me.neon.libs.util.replacePlaceholder
@@ -109,11 +110,23 @@ class JavaScriptUtils {
     }
 
     fun runCommand(player: Player, string: String) {
-        Bukkit.dispatchCommand(player, string.replacePlaceholder(player))
+        if (Bukkit.isPrimaryThread()) {
+            Bukkit.dispatchCommand(player, string.replacePlaceholder(player))
+        } else {
+            Bukkit.getScheduler().runTask(NeonLibsLoader.getInstance(), Runnable {
+                Bukkit.dispatchCommand(player, string.replacePlaceholder(player))
+            })
+        }
     }
 
     fun runConsoleCommand(player: Player?, string: String) {
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), if (player != null) string.replacePlaceholder(player) else string)
+        if (Bukkit.isPrimaryThread()) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), if (player != null) string.replacePlaceholder(player) else string)
+        } else {
+            Bukkit.getScheduler().runTask(NeonLibsLoader.getInstance(), Runnable {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), if (player != null) string.replacePlaceholder(player) else string)
+            })
+        }
     }
 
     /**

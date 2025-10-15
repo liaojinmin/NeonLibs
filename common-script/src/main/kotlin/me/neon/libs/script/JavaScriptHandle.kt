@@ -1,5 +1,7 @@
 package me.neon.libs.script
 
+import me.neon.libs.core.env.RuntimeDependencies
+import me.neon.libs.core.env.RuntimeDependency
 import me.neon.libs.script.action.ActionBase
 import me.neon.libs.script.action.group.ExecuteGroup
 import me.neon.libs.script.action.group.IGroup
@@ -26,6 +28,13 @@ import javax.script.*
  * @since 2024/2/21 22:10
  */
 
+@RuntimeDependencies(
+    RuntimeDependency(
+        value = "!org.openjdk.nashorn:nashorn-core:15.6",
+        test = "!jdk.nashorn.api.scripting.NashornScriptEngineFactory",
+        transitive = false
+    )
+)
 object JavaScriptHandle {
 
     private val scriptEngineFactory by lazy {
@@ -128,6 +137,11 @@ object JavaScriptHandle {
         return any.toString().lowercase().matches(TRUE)
     }
 
+    fun loaderExecuteGroup(path: String, root: me.neon.libs.taboolib.configuration.ConfigurationSection?): ExecuteGroup? {
+        root ?: return null
+        return ExecuteGroup(IGroup.ofGroups(root[path]))
+    }
+
     fun loaderExecuteGroup(path: String, root: ConfigurationSection?): ExecuteGroup? {
         root ?: return null
         return ExecuteGroup(IGroup.ofGroups(root.get(path)))
@@ -136,6 +150,14 @@ object JavaScriptHandle {
     fun loaderExecuteGroup(root: Any?): ExecuteGroup? {
         root ?: return null
         return ExecuteGroup(IGroup.ofGroups(root))
+    }
+
+    fun loaderGroup(root: me.neon.libs.taboolib.configuration.ConfigurationSection?): MutableMap<String, ExecuteGroup> {
+        val map = mutableMapOf<String, ExecuteGroup>()
+        root?.getKeys(false)?.forEach {
+            map[it] = ExecuteGroup(IGroup.ofGroups(root[it]))
+        }
+        return map
     }
 
     fun loaderGroup(root: ConfigurationSection?): MutableMap<String, ExecuteGroup> {

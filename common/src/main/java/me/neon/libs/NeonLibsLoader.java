@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import org.tabooproject.reflex.ClassAnalyser;
 
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -27,14 +26,6 @@ import java.util.logging.Logger;
  * @author 老廖
  * @since 2024/2/28 20:33
  */
-@RuntimeDependencies({
-        @RuntimeDependency(
-                value = "!org.openjdk.nashorn:nashorn-core:15.4",
-                test = "!jdk.nashorn.api.scripting.NashornScriptEngineFactory",
-                transitive = false
-        )
-
-})
 public class NeonLibsLoader extends JavaPlugin {
 
     private static final ConcurrentHashMap<String, LifeCycleLoader> registerPlugin = new ConcurrentHashMap<>();

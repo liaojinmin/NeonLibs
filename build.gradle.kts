@@ -49,12 +49,8 @@ subprojects {
 
         compileOnly("de.tr7zw:item-nbt-api:2.15.2")
 
-        compileOnly("org.openjdk.nashorn:nashorn-core:15.4") {
-            exclude(group = "org.ow2.asm")
-        }
-
         // server
-        compileOnly("ink.ptms.core:v11604:11604")
+       // compileOnly("ink.ptms.core:v11604:11604")
         compileOnly("org.ow2.asm:asm:9.6")
         compileOnly("org.ow2.asm:asm-util:9.6")
         compileOnly("org.ow2.asm:asm-commons:9.6")

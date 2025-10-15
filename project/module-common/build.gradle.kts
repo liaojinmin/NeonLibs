@@ -5,6 +5,7 @@ repositories {
     }
 }
 dependencies {
+    compileOnly("ink.ptms.core:v11604:11604")
     compileOnly("net.kyori:adventure-api:4.9.2")
     compileOnly(project(":common"))
     compileOnly(project(":common-env"))

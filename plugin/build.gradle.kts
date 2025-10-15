@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":project:module-nms-data-serializer:nms-data-serializer-legacy"))
     implementation(project(":project:module-nms-util"))
     implementation(project(":project:module-nms-carrier"))
+    implementation(project(":project:module-configuration"))
     implementation(project(":project:module-effect"))
 }
 
@@ -65,6 +66,12 @@ tasks {
         relocate("com.zaxxer.hikari", "${rootProject.group}.libraries.zaxxer.hikari")
         // slf4j ’hikari‘
         relocate("org.slf4j", "${rootProject.group}.libraries.org.slf4j")
+
+        // nightconfig
+        relocate("com.electronwill.nightconfig.core.conversion", "${rootProject.group}.libraries.configuration")
+        relocate("com.electronwill.nightconfig", "com.electronwill.nightconfig_3_6_7")
+        // snakeyaml
+        relocate("org.yaml.snakeyaml", "org.yaml.snakeyaml_2_2")
 
         classifier = null
     }

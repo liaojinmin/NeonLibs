@@ -47,12 +47,14 @@ class NMSEntityImpl : NMSEntity() {
     /**
      * 1.19.3, 1.20 -> BuiltInRegistries.VILLAGER_PROFESSION
      */
-    val villagerProfessionBuiltInRegistries by unsafeLazy { nmsClass("BuiltInRegistries").getProperty<Any>("VILLAGER_PROFESSION", isStatic = true)!! }
+    val villagerProfessionBuiltInRegistries by unsafeLazy {
+        nmsClass("BuiltInRegistries").getProperty<Any>("VILLAGER_PROFESSION", isStatic = true)!! }
 
     /**
      * 1.17, 1.19.2 -> IRegistry.VILLAGER_PROFESSION
      */
-    val villagerProfessionIRegistry by unsafeLazy { nmsClass("IRegistry").getProperty<Any>("VILLAGER_PROFESSION", isStatic = true)!! }
+    val villagerProfessionIRegistry by unsafeLazy {
+        nmsClass("IRegistry").getProperty<Any>("VILLAGER_PROFESSION", isStatic = true)!! }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Entity> spawnEntity(location: Location, entity: Class<T>, callback: Consumer<T>): T {

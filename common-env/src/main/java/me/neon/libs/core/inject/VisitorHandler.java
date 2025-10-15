@@ -109,6 +109,7 @@ public class VisitorHandler {
         for (ClassVisitor visitor : group.get(lifeCycle)) {
             try {
                 visitor.visitStart(plugin, clazz, instance);
+                visitor.visitStart(clazz, instance);
             } catch (Throwable ex) {
                 new ClassVisitException(clazz, group, ex).printStackTrace();
             }
@@ -120,6 +121,7 @@ public class VisitorHandler {
             for (ClassField field : reflexClass.getStructure().getFields()) {
                 try {
                     visitor.visitField(plugin, field, clazz, instance);
+                    visitor.visitField(field, clazz, instance);
                 } catch (Throwable ex) {
                     new ClassVisitException(clazz, group, field, ex).printStackTrace();
                 }
@@ -132,6 +134,7 @@ public class VisitorHandler {
             for (ClassMethod method : reflexClass.getStructure().getMethods()) {
                 try {
                     visitor.visitMethod(plugin, method, clazz, instance);
+                    visitor.visitMethod(method, clazz, instance);
                 } catch (Throwable ex) {
                     new ClassVisitException(clazz, group, method, ex).printStackTrace();
                 }
@@ -143,6 +146,7 @@ public class VisitorHandler {
         for (ClassVisitor visitor : group.get(lifeCycle)) {
             try {
                 visitor.visitEnd(plugin, clazz, instance);
+                visitor.visitEnd(clazz, instance);
             } catch (Throwable ex) {
                 new ClassVisitException(clazz, group, ex).printStackTrace();
             }

@@ -1,5 +1,7 @@
 dependencies {
 
+    compileOnly("ink.ptms.core:v11604:11604")
+
     implementation("me.lucko:jar-relocator:1.5") {
         exclude(group = "org.ow2.asm")
     }
