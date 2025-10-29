@@ -54,42 +54,4 @@ object Demo: DataSerializer<MyBlockData> {
         SerializationRegistry.register(this)
     }
 
-    /*
-    @SubscribeEvent
-    fun onPlayerInteract(e: PlayerInteractEvent) {
-        val block = e.clickedBlock ?: return
-        if (block.type == Material.AIR) return
-        if (e.hand != EquipmentSlot.HAND) return
-        if (e.action == Action.LEFT_CLICK_BLOCK) {
-            test(e.player, block.world, block)
-        } else {
-            if (e.action == Action.RIGHT_CLICK_BLOCK) {
-                parse(e.player, block.world, block)
-            }
-        }
-    }
-
-     */
-
-    private fun parse(player: Player, world: World, click: Block) {
-        // 2️⃣ 获取世界数据存储
-        val storage = WorldDataManager.getWorldDataStorage(world)
-            ?: error("WorldDataStorage 未加载")
-        val loadedData = storage.getBlockData(click.chunk, click.location.of(), "example".fromString()) as? MyBlockData
-        player.sendMessage("Loaded color=${loadedData?.color}, durability=${loadedData?.durability}")
-    }
-
-    private fun test(player: Player, world: World, click: Block) {
-        // 2获取世界数据存储
-        val storage = WorldDataManager.getWorldDataStorage(world)
-            ?: error("WorldDataStorage 未加载")
-        // 存储自定义方块数据
-        val pos = click.location.of()
-        storage.setBlockData(click.chunk, pos, "example".fromString(), MyBlockData( color = "red", durability =  100))
-        player.sendMessage("Block data saved in chunk.")
-        // 重新加载验证
-        val reloadedChunk = storage.getBlockData(click.chunk, pos, "example".fromString()) as? MyBlockData
-        player.sendMessage("Loaded $reloadedChunk")
-    }
-
 }

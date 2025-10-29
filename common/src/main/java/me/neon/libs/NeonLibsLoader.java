@@ -1,5 +1,6 @@
 package me.neon.libs;
 
+import me.neon.libs.chunk.WorldDataManager;
 import me.neon.libs.core.ProjectScannerKt;
 import me.neon.libs.core.env.*;
 import me.neon.libs.core.inject.*;
@@ -174,13 +175,17 @@ public class NeonLibsLoader extends JavaPlugin {
         VisitorHandler.injectAll(this, LifeCycle.ENABLE, classes);
 
         Bukkit.getPluginManager().registerEvents(new LifeCycleListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BasiceListener(), this);
         // NBTAPI
         de.tr7zw.changeme.nbtapi.utils.MinecraftVersion.disableBStats();
         de.tr7zw.changeme.nbtapi.utils.MinecraftVersion.disableUpdateCheck();
         de.tr7zw.changeme.nbtapi.utils.MinecraftVersion.replaceLogger(this.getLogger());
         de.tr7zw.changeme.nbtapi.utils.MinecraftVersion.getVersion();
 
-        RunnerDslKt.syncRunner(5, () -> VisitorHandler.injectAll(this, LifeCycle.ACTIVE, classes));
+        RunnerDslKt.syncRunner(5, () -> {
+            VisitorHandler.injectAll(this, LifeCycle.ACTIVE, classes);
+            Bukkit.getWorlds().forEach(WorldDataManager.INSTANCE::onWorldLoad);
+        });
     }
 
     @Override

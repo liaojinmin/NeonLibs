@@ -23,13 +23,6 @@ object WorldDataManager {
 
     private val worlds = mutableMapOf<String, WorldDataStorage>()
 
-    @Awake(LifeCycle.ACTIVE)
-    fun start() {
-        Bukkit.getWorlds().forEach {
-            onWorldLoad(it)
-        }
-    }
-
     fun getWorldDataStorage(world: World): WorldDataStorage? {
         return worlds[world.name]
     }
