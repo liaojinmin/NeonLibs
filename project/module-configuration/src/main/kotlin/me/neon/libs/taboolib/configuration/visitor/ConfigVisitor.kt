@@ -3,8 +3,6 @@ package me.neon.libs.taboolib.configuration.visitor
 import me.neon.libs.NeonLibsLoader
 import me.neon.libs.NeonLibsServiceAPI
 import me.neon.libs.core.LifeCycle
-import me.neon.libs.core.env.RuntimeDependencies
-import me.neon.libs.core.env.RuntimeDependency
 import me.neon.libs.core.inject.ClassVisitor
 import me.neon.libs.core.inject.Instance
 import me.neon.libs.core.inject.Visitor

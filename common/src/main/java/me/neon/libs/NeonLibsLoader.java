@@ -1,5 +1,6 @@
 package me.neon.libs;
 
+import me.neon.libs.chunk.DefaultData;
 import me.neon.libs.chunk.WorldDataManager;
 import me.neon.libs.core.ProjectScannerKt;
 import me.neon.libs.core.env.*;
@@ -124,9 +125,9 @@ public class NeonLibsLoader extends JavaPlugin {
             Map<String, Class<?>> map = ProjectScannerKt.getClasses(this.getClass().getProtectionDomain().getCodeSource().getLocation(), this.getClassLoader());
             classes = new HashSet<>(map.size());
 
-            // 只对 taboolib、carrier、Action 目录下的类进行唤醒
+            // 只对 taboolib、carrier、script 目录下的类进行唤醒
             map.forEach((key, value) -> {
-                if (key.contains(".taboolib.") || key.contains(".carrier.")) {
+                if (key.contains(".taboolib.") || key.contains(".carrier.") || key.contains(".script.")) {
                     classes.add(value);
                 }
             });
@@ -183,8 +184,9 @@ public class NeonLibsLoader extends JavaPlugin {
         de.tr7zw.changeme.nbtapi.utils.MinecraftVersion.getVersion();
 
         RunnerDslKt.syncRunner(5, () -> {
-            VisitorHandler.injectAll(this, LifeCycle.ACTIVE, classes);
+            DefaultData.INSTANCE.init();
             Bukkit.getWorlds().forEach(WorldDataManager.INSTANCE::onWorldLoad);
+            VisitorHandler.injectAll(this, LifeCycle.ACTIVE, classes);
         });
     }
 

@@ -27,7 +27,7 @@ import javax.script.*
  * @author 老廖
  * @since 2024/2/21 22:10
  */
-
+/*
 @RuntimeDependencies(
     RuntimeDependency(
         value = "!org.openjdk.nashorn:nashorn-core:15.6",
@@ -35,6 +35,8 @@ import javax.script.*
         transitive = false
     )
 )
+
+ */
 object JavaScriptHandle {
 
     private val scriptEngineFactory by lazy {

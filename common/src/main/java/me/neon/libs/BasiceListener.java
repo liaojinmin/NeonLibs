@@ -2,7 +2,9 @@ package me.neon.libs;
 
 import me.neon.libs.chunk.WorldDataManager;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
@@ -37,5 +39,9 @@ public class BasiceListener implements Listener {
     @EventHandler
     private void onChunkUnload(ChunkUnloadEvent event) {
         WorldDataManager.INSTANCE.onChunkUnload(event.getChunk());
+    }
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    private void onBlockBreak(BlockBreakEvent event) {
+        WorldDataManager.INSTANCE.onBlockBreak(event.getBlock());
     }
 }

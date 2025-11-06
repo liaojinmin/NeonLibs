@@ -21,9 +21,10 @@ dependencies {
     implementation(project(":project:module-nms-data-serializer:nms-data-serializer-12005"))
     implementation(project(":project:module-nms-data-serializer:nms-data-serializer-legacy"))
     implementation(project(":project:module-nms-util"))
+    implementation(project(":project:module-nms-ai"))
     implementation(project(":project:module-nms-carrier"))
     implementation(project(":project:module-configuration"))
-    implementation(project(":project:module-effect"))
+    //implementation(project(":project:module-effect"))
 }
 
 tasks {
@@ -69,9 +70,12 @@ tasks {
 
         // nightconfig
         relocate("com.electronwill.nightconfig.core.conversion", "${rootProject.group}.libraries.configuration")
-        relocate("com.electronwill.nightconfig", "com.electronwill.nightconfig_3_6_7")
+        relocate("com.electronwill.nightconfig", "${rootProject.group}.libraries.electronwill")
         // snakeyaml
-        relocate("org.yaml.snakeyaml", "org.yaml.snakeyaml_2_2")
+        relocate("org.yaml.snakeyaml", "${rootProject.group}.libraries.snakeyaml")
+
+        // openjdk
+        relocate("rg.openjdk.nashorn", "${rootProject.group}.libraries.nashorn")
 
         classifier = null
     }

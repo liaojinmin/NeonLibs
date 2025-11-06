@@ -7,6 +7,7 @@ import me.neon.libs.event.SubscribeEvent
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
 import org.bukkit.World
+import org.bukkit.block.Block
 import org.bukkit.event.world.ChunkLoadEvent
 import org.bukkit.event.world.ChunkUnloadEvent
 import org.bukkit.event.world.WorldLoadEvent
@@ -52,16 +53,9 @@ object WorldDataManager {
         storage.saveChunk(chunk)
     }
 
-    @SubscribeEvent
-    private fun onWorldLoad(e: WorldLoadEvent) = onWorldLoad(e.world)
-
-    @SubscribeEvent
-    private fun onWorldUnload(e: WorldUnloadEvent) = onWorldUnload(e.world)
-
-    @SubscribeEvent
-    private fun onChunkLoad(e: ChunkLoadEvent) = onChunkLoad(e.chunk)
-
-    @SubscribeEvent
-    private fun onChunkUnload(e: ChunkUnloadEvent) = onChunkUnload(e.chunk)
+    fun onBlockBreak(block: Block) {
+        val storage = worlds[block.world.name] ?: return
+        storage.removeBlockData(block)
+    }
 
 }

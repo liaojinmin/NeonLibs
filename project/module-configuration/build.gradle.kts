@@ -17,7 +17,6 @@ dependencies {
     implementation("com.electronwill.night-config:hocon:3.6.7")
     implementation("com.electronwill.night-config:core-conversion:6.0.0")
 
-
 }
 
 repositories {

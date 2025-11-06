@@ -4,9 +4,11 @@ import me.neon.libs.chunk.index.VPos
 import me.neon.libs.chunk.data.ICustomData
 import me.neon.libs.chunk.index.VChunk
 import me.neon.libs.chunk.index.VKey
+import me.neon.libs.chunk.index.VPos.Companion.of
 import me.neon.libs.chunk.index.VRegion
 import org.bukkit.Chunk
 import org.bukkit.World
+import org.bukkit.block.Block
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
@@ -78,6 +80,21 @@ class WorldDataStorage(
         saveChunk(chunkDataStorage.vChunk)
     }
 
+    fun <T: ICustomData> getTypeBlockData(chunk: Chunk, pos: VPos, key: VKey): T? {
+        val chunkDataStorage = loadChunk(chunk)
+        return chunkDataStorage.getTypeBlockData(pos, key)
+    }
+
+    fun getAllBlockData(chunk: Chunk, pos: VPos): List<ICustomData> {
+        val chunkDataStorage = loadChunk(chunk)
+        return chunkDataStorage.getAllBlockData(pos)
+    }
+
+    fun getAllBlockDataMap(chunk: Chunk, pos: VPos): Map<VKey, ICustomData> {
+        val chunkDataStorage = loadChunk(chunk)
+        return chunkDataStorage.getAllBlockDataMap(pos)
+    }
+
     fun getBlockData(chunk: Chunk, pos: VPos, key: VKey): ICustomData? {
         val chunkDataStorage = loadChunk(chunk)
         return chunkDataStorage.getBlockData(pos, key)
@@ -87,6 +104,18 @@ class WorldDataStorage(
         val chunkDataStorage = loadChunk(chunk)
         chunkDataStorage.removeBlockData(pos, key)
         saveChunk(chunk)
+    }
+
+    fun removeBlockData(block: Block) {
+        val chunk = block.chunk
+        val chunkDataStorage = loadChunk(chunk)
+        chunkDataStorage.removeBlockData(block.of())
+        saveChunk(chunk)
+    }
+
+    fun hasBlockData(chunk: Chunk, pos: VPos, key: VKey): Boolean {
+        val chunkDataStorage = loadChunk(chunk)
+        return chunkDataStorage.hasBlockData(pos, key)
     }
 
     fun setChunkData(chunk: Chunk, key: VKey, data: ICustomData) {

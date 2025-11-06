@@ -53,6 +53,10 @@ fun nmsClass(name: String): Class<*> {
     }
 }
 
+inline fun <reified T> nmsProxy(plugin: Plugin, bind: String): T {
+    return nmsProxy(T::class.java, plugin, bind, emptyList())
+}
+
 inline fun <reified T> nmsProxy(plugin: Plugin, bind: String = "{name}Impl", vararg parameter: Any): T {
     return nmsProxy(T::class.java, plugin, bind, emptyList(), *parameter)
 }

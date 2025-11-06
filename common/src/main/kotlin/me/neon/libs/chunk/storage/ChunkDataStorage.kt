@@ -68,13 +68,28 @@ data class ChunkDataStorage internal constructor(val vChunk: VChunk) {
     fun setBlockData(pos: VPos, key: VKey, data: ICustomData) {
         blockDataMap.getOrPut(pos) { mutableMapOf() }[key] = data
     }
+
+    fun <T: ICustomData> getTypeBlockData(pos: VPos, key: VKey): T? = blockDataMap[pos]?.get(key) as? T
+
     fun getBlockData(pos: VPos, key: VKey): ICustomData? = blockDataMap[pos]?.get(key)
+
+    fun getAllBlockData(pos: VPos): List<ICustomData> {
+        return blockDataMap[pos]?.values?.toList() ?: emptyList()
+    }
+
+    fun getAllBlockDataMap(pos: VPos): Map<VKey, ICustomData> {
+        return blockDataMap[pos]?.toMap() ?: emptyMap()
+    }
 
     fun hasBlockData(pos: VPos, key: VKey): Boolean = blockDataMap[pos]?.containsKey(key) == true
 
     fun removeBlockData(pos: VPos, key: VKey) {
         blockDataMap[pos]?.remove(key)
         if (blockDataMap[pos]?.isEmpty() == true) blockDataMap.remove(pos)
+    }
+
+    fun removeBlockData(pos: VPos) {
+        blockDataMap.remove(pos)
     }
 
     fun setChunkData(key: VKey, data: ICustomData) { chunkDataMap[key] = data }

@@ -51,9 +51,9 @@ subprojects {
 
         // server
        // compileOnly("ink.ptms.core:v11604:11604")
-        compileOnly("org.ow2.asm:asm:9.6")
-        compileOnly("org.ow2.asm:asm-util:9.6")
-        compileOnly("org.ow2.asm:asm-commons:9.6")
+       // compileOnly("org.ow2.asm:asm:9.6")
+       // compileOnly("org.ow2.asm:asm-util:9.6")
+        //compileOnly("org.ow2.asm:asm-commons:9.6")
 
         compileOnly("org.tabooproject.reflex:reflex:1.2.0")
         compileOnly("org.tabooproject.reflex:analyser:1.2.0")

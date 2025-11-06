@@ -1,17 +1,12 @@
 package me.neon.libs.chunk
 
 import com.google.gson.JsonObject
-import me.neon.libs.chunk.Demo.MyBlockData
-import me.neon.libs.chunk.index.VPos.Companion.of
+import me.neon.libs.chunk.DefaultData.MyBlockData
 import me.neon.libs.chunk.data.DataSerializer
 import me.neon.libs.chunk.data.ICustomData
 import me.neon.libs.chunk.data.SerializationRegistry
 import me.neon.libs.chunk.index.VKey
 import me.neon.libs.chunk.index.VKey.Companion.fromString
-
-import org.bukkit.World
-import org.bukkit.block.Block
-import org.bukkit.entity.Player
 
 /**
  * NeonEngine
@@ -20,7 +15,7 @@ import org.bukkit.entity.Player
  * @author 老廖
  * @since 2025/10/27 19:16
  */
-object Demo: DataSerializer<MyBlockData> {
+object DefaultData: DataSerializer<MyBlockData> {
 
     data class MyBlockData(
         override val key: VKey = "MyBlockData".fromString(),
@@ -49,7 +44,7 @@ object Demo: DataSerializer<MyBlockData> {
         )
     }
 
-    init {
+    fun init() {
         // 1️⃣ 注册序列化器
         SerializationRegistry.register(this)
     }
