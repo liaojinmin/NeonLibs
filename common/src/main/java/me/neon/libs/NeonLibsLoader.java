@@ -127,7 +127,7 @@ public class NeonLibsLoader extends JavaPlugin {
 
             // 只对 taboolib、carrier、script 目录下的类进行唤醒
             map.forEach((key, value) -> {
-                if (key.contains(".taboolib.") || key.contains(".carrier.") || key.contains(".script.")) {
+                if (key.contains(".taboolib.") || key.contains(".carrier.") || key.contains(".script.") || key.contains(".region.")) {
                     classes.add(value);
                 }
             });

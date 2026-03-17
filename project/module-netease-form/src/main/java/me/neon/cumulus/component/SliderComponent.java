@@ -1,0 +1,82 @@
+/*
+ * Copyright (c) 2020-2023 GeyserMC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * @author GeyserMC
+ * @link https://github.com/GeyserMC/Cumulus
+ */
+package me.neon.cumulus.component;
+
+import me.neon.cumulus.component.impl.SliderComponentImpl;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Slider component is a component that can only be used in CustomForm. With this component you can
+ * slide between the min (left) and max (right) using the provided step size. The Bedrock client
+ * does not work well with a negative step value. Because of that, Cumulus does not allow the min
+ * higher than the max and also doesn't allow a negative step value.<br>
+ * Cumulus will generate a default value if none is provided. It will try to find a valid step in
+ * the middle of your range, but if your step size is too low it will use the min value instead.
+ */
+public interface SliderComponent extends Component {
+  static @NotNull SliderComponent of(
+      @NotNull String text, float min, float max, float step, float defaultValue) {
+    return new SliderComponentImpl(text, min, max, step, defaultValue);
+  }
+
+  static @NotNull SliderComponent of(
+      @NotNull String text, float min, float max, float step) {
+    return new SliderComponentImpl(text, min, max, step);
+  }
+
+  static @NotNull SliderComponent of(@NotNull String text, float min, float max) {
+    return of(text, min, max, 1);
+  }
+
+  /**
+   * Returns the minimum value of the slider.
+   *
+   * @since 1.1
+   */
+  float minValue();
+
+  /**
+   * Returns the maximum value of the slider.
+   *
+   * @since 1.1
+   */
+  float maxValue();
+
+  /**
+   * Returns the amount that each step should add to the value.
+   *
+   * @since 1.1
+   */
+  float step();
+
+  /**
+   * Returns the default value of the slider.
+   *
+   * @since 1.1
+   */
+  float defaultValue();
+
+  // todo control_locked ??
+}

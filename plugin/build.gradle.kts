@@ -12,6 +12,7 @@ val generatedYamlDir = File("$buildDir/generated")
 dependencies {
     implementation(project(":common-env"))
     implementation(project(":common-script"))
+    implementation(project(":common-region"))
     implementation(project(":common"))
     implementation(project(":project:module-hook"))
  //   implementation(project(":project:module-smtp"))
@@ -20,10 +21,14 @@ dependencies {
     implementation(project(":project:module-nms-data-serializer"))
     implementation(project(":project:module-nms-data-serializer:nms-data-serializer-12005"))
     implementation(project(":project:module-nms-data-serializer:nms-data-serializer-legacy"))
+    implementation(project(":project:module-ui"))
+    implementation(project(":project:module-ui:ui-12100"))
+    implementation(project(":project:module-ui:ui-legacy"))
     implementation(project(":project:module-nms-util"))
     implementation(project(":project:module-nms-ai"))
     implementation(project(":project:module-nms-carrier"))
     implementation(project(":project:module-configuration"))
+    implementation(project(":project:module-netease-form"))
     //implementation(project(":project:module-effect"))
 }
 

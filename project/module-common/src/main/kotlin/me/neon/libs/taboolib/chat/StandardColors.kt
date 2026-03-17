@@ -7,6 +7,11 @@ import java.util.*
  * @author sky
  * @since 2021/1/18 2:02 下午
  */
+@Deprecated(
+    "使用统一方案",
+    replaceWith = ReplaceWith("me.neon.libs.util.HexColor.StandardColors"),
+    level = DeprecationLevel.WARNING
+)
 enum class StandardColors(val display: String, val chatColor: ChatColor) {
     BLACK("黑", ChatColor.BLACK), DARK_BLUE("深蓝", ChatColor.DARK_BLUE), DARK_GREEN(
         "深绿",

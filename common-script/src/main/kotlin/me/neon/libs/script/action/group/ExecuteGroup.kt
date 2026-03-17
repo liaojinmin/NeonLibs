@@ -2,6 +2,7 @@ package me.neon.libs.script.action.group
 
 import me.neon.libs.script.action.ActionEntry
 import me.neon.libs.script.action.ActionExecute
+import me.neon.libs.script.put
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -44,16 +45,21 @@ data class ExecuteGroup(
 
     fun eval(player: Player, factory: SimpleScriptContext, event: Event? = null): CompletableFuture<Boolean> {
         if (reacts.isEmpty()) return CompletableFuture.completedFuture(true)
+        if (event != null) {
+            factory.put("event", event)
+        }
         //println("准备运行")
         return if (Bukkit.isPrimaryThread()) {
             //println("  异步线程运行")
             CompletableFuture.supplyAsync {
                 //println("  正在取值")
-                ActionExecute(player, null, reacts, AtomicBoolean(false), factory).eval()
+                ActionExecute(player, event, reacts, AtomicBoolean(false), factory)
+                    .eval()
                     .join()
             }
         } else {
-            ActionExecute(player, event, reacts, AtomicBoolean(false), factory).eval()
+            ActionExecute(player, event, reacts, AtomicBoolean(false), factory)
+                .eval()
         }
     }
 

@@ -10,6 +10,8 @@ dependencies {
     implementation("org.ow2.asm:asm:9.6")
     implementation("org.ow2.asm:asm-util:9.6")
     implementation("org.ow2.asm:asm-commons:9.6")
+    implementation("it.unimi.dsi:fastutil:8.5.9")
+
 
     implementation("org.tabooproject.reflex:reflex:1.2.0") {
         exclude(group = "org.ow2.asm")

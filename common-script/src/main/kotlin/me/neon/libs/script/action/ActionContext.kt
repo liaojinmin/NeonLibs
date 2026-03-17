@@ -18,6 +18,12 @@ class ActionContext: HashMap<String, Any> {
         this[key] = any
     }
 
+    inline fun <reified T> getTypeOrNull(key: String): T? {
+        return this[key] as? T
+    }
+
+    fun <T> getType(key: String) = (this[key] ?: error("不存在 $key 的映射")) as T
+
     fun stringContent(value: Any? = null): String {
         if (value != null) {
             this["content"] = value

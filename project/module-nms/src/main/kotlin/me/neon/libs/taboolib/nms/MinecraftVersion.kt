@@ -2,12 +2,14 @@ package me.neon.libs.taboolib.nms
 
 import me.neon.libs.core.LifeCycle
 import me.neon.libs.core.PrimitiveIO
+import me.neon.libs.core.env.RuntimeEnv
 import me.neon.libs.core.inject.Awake
 import me.neon.libs.taboolib.nms.remap.RemapReflexPaper
 import me.neon.libs.taboolib.nms.remap.RemapReflexSpigot
 import me.neon.libs.util.unsafeLazy
 import org.bukkit.Bukkit
 import org.tabooproject.reflex.Reflex
+import java.io.File
 
 import java.io.FileInputStream
 
@@ -68,7 +70,7 @@ object MinecraftVersion {
         arrayOf("1.18", "1.18.1", "1.18.2"),                                             // 10
         arrayOf("1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4"),                         // 11
         arrayOf("1.20", "1.20.1", "1.20.2", "!1.20.3", "1.20.4", "!1.20.5", "1.20.6"),   // 12 (跳过 1.20.3、1.20.5) NOTICE 从 1.20.5 开始, paper 进行了破坏性修改
-        arrayOf("1.21", "1.21.1")                                                        // 13 (跳过 1.21)
+        arrayOf("!1.21", "1.21.1", "!1.21.2", "1.21.3", "1.21.4", "1.21.5", "!1.21.6", "!1.21.7", "1.21.8", "!1.21.9", "1.21.10", "1.21.11")     // 13 (跳过 1.21、1.21.2、1.21.6、1.21.7 和 1.21.9)
         // @formatter:on
     )
 
@@ -150,16 +152,14 @@ object MinecraftVersion {
      * 当前运行版本的 Spigot 映射文件
      */
     val spigotMapping by unsafeLazy {
-        // 如果已被其他插件加载，直接从内存中读取
-        if (Exchanges.MAPPING_SPIGOT in Exchanges) {
-            Mapping.exchange(Exchanges.MAPPING_SPIGOT)
-        } else {
-            val current = SpigotMapping.current ?: throw RuntimeException("current == null")
-            Mapping.spigot(
-                FileInputStream("assets/${current.combined.substring(0, 2)}/${current.combined}"),
-                FileInputStream("assets/${current.fields.substring(0, 2)}/${current.fields}"),
-            ).exchange(Exchanges.MAPPING_SPIGOT)
-        }
+
+        val current = SpigotMapping.current ?: throw RuntimeException("current == null")
+        Mapping.spigot(
+            FileInputStream(File(PrimitiveIO.getAssetsFile(), "${current.combined.substring(0, 2)}/${current.combined}")),
+           // FileInputStream("assets/${current.fields.substring(0, 2)}/${current.fields}"),
+            FileInputStream(File(PrimitiveIO.getAssetsFile(), "${current.fields.substring(0, 2)}/${current.fields}")),
+        ).exchange(Exchanges.MAPPING_SPIGOT)
+
     }
         /*
         .also {
@@ -207,12 +207,7 @@ object MinecraftVersion {
      * 这么做的原因是要保证 TabooLib 本体必须能够在 Spigot 环境下运行。
      */
     val paperMapping by unsafeLazy {
-        // 如果已被其他插件加载，直接从内存中读取
-        if (Exchanges.MAPPING_PAPER in Exchanges) {
-            Mapping.exchange(Exchanges.MAPPING_PAPER)
-        } else {
-            Mapping.paper().exchange(Exchanges.MAPPING_PAPER)
-        }
+        Mapping.paper().exchange(Exchanges.MAPPING_PAPER)
     }/*
         .also {
         println("paperMapping >>>>>>>>>>>>>>")

@@ -1,6 +1,9 @@
 package me.neon.libs.taboolib.chat
 
+import me.neon.libs.util.item.checkItem
+import me.neon.libs.util.item.hasItem
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 
 /**
@@ -11,6 +14,9 @@ import org.bukkit.command.CommandSender
 class RawMessage(val component: Component = Component.empty()) {
 
     fun sendTo(target: CommandSender, builder: RawMessage.() -> Unit = {}) {
+        (target as Player).inventory.hasItem {
+            true
+        }
         builder(this)
         component.sendTo(target)
     }

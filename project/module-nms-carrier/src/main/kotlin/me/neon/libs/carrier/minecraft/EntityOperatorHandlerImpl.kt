@@ -141,7 +141,7 @@ internal class EntityOperatorHandlerImpl: EntityOperatorHandler {
            return NMSEntityType.adapt(entityType).id
         }
         val names = ArrayList<String>()
-        names +=  if (entityType != EntityType.DROPPED_ITEM) entityType.name.uppercase() else "ITEM"
+        names +=  if (entityType != EntityType.DROPPED_ITEM) entityType.name.uppercase() else "item"
         names += NMSEntityType.adapt(entityType).id.toString()
         names.forEach {
             kotlin.runCatching {

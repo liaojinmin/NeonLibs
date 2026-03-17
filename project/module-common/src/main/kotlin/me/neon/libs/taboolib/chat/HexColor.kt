@@ -8,12 +8,18 @@ import kotlin.math.ceil
  * @author sky
  * @since 2021/1/18 2:02 下午
  */
+@Deprecated(
+    "使用统一方案",
+    replaceWith = ReplaceWith("me.neon.libs.util.HexColor"),
+    level = DeprecationLevel.WARNING
+)
 object HexColor {
 
     private var isLegacy = false
 
     init {
         try {
+
             ChatColor.of(Color.BLACK)
         } catch (ignored: NoSuchMethodError) {
             isLegacy = true

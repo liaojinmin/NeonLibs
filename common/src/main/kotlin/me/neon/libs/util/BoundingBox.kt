@@ -4,6 +4,7 @@ import org.apache.commons.lang.Validate
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.util.RayTraceResult
 import org.bukkit.util.Vector
 
@@ -17,6 +18,15 @@ import org.bukkit.util.Vector
 class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2: Double) : Cloneable {
 
     companion object {
+
+        fun of(corner1: me.neon.libs.util.Vector, corner2: me.neon.libs.util.Vector): BoundingBox {
+            return BoundingBox(corner1.x, corner1.y, corner1.z, corner2.x, corner2.y, corner2.z)
+        }
+
+        fun of(corner1: me.neon.libs.util.Location, corner2: me.neon.libs.util.Location): BoundingBox {
+            Validate.isTrue(corner1.world == corner2.world, "Locations from different worlds!")
+            return BoundingBox(corner1.x, corner1.y, corner1.z, corner2.x, corner2.y, corner2.z)
+        }
 
         fun of(corner1: Vector, corner2: Vector): BoundingBox {
             return BoundingBox(corner1.x, corner1.y, corner1.z, corner2.x, corner2.y, corner2.z)
@@ -60,6 +70,14 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
         }
 
         fun of(center: Location, x: Double, y: Double, z: Double): BoundingBox {
+            return BoundingBox(center.x - x, center.y - y, center.z - z, center.x + x, center.y + y, center.z + z)
+        }
+
+        fun of(center: me.neon.libs.util.Vector, x: Double, y: Double, z: Double): BoundingBox {
+            return BoundingBox(center.x - x, center.y - y, center.z - z, center.x + x, center.y + y, center.z + z)
+        }
+
+        fun of(center: me.neon.libs.util.Location, x: Double, y: Double, z: Double): BoundingBox {
             return BoundingBox(center.x - x, center.y - y, center.z - z, center.x + x, center.y + y, center.z + z)
         }
 
@@ -150,6 +168,10 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
         return Vector(getCenterX(), getCenterY(), getCenterZ())
     }
 
+    fun getCenterAtNeonLibs(): me.neon.libs.util.Vector {
+        return me.neon.libs.util.Vector(getCenterX(), getCenterY(), getCenterZ())
+    }
+
     fun copy(other: BoundingBox): BoundingBox {
         return resize(other.minX, other.minY, other.minZ, other.maxX, other.maxY, other.maxZ)
     }
@@ -213,6 +235,13 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
         return this.expand(x, y, z, x, y, z)
     }
 
+    fun expand(expansion: me.neon.libs.util.Vector): BoundingBox {
+        val x = expansion.x
+        val y = expansion.y
+        val z = expansion.z
+        return this.expand(x, y, z, x, y, z)
+    }
+
     fun expand(expansion: Vector): BoundingBox {
         val x = expansion.x
         val y = expansion.y
@@ -240,6 +269,10 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
         }
     }
 
+    fun expand(direction: me.neon.libs.util.Vector, expansion: Double): BoundingBox {
+        return this.expand(direction.x, direction.y, direction.z, expansion)
+    }
+
     fun expand(direction: Vector, expansion: Double): BoundingBox {
         return this.expand(direction.x, direction.y, direction.z, expansion)
     }
@@ -250,6 +283,10 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
 
     fun expandDirectional(dirX: Double, dirY: Double, dirZ: Double): BoundingBox {
         return this.expand(dirX, dirY, dirZ, 1.0)
+    }
+
+    fun expandDirectional(direction: me.neon.libs.util.Vector): BoundingBox {
+        return this.expand(direction.x, direction.y, direction.z, 1.0)
     }
 
     fun expandDirectional(direction: Vector): BoundingBox {
@@ -275,7 +312,15 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
         )
     }
 
+    fun union(position: me.neon.libs.util.Vector): BoundingBox {
+        return this.union(position.x, position.y, position.z)
+    }
+
     fun union(position: Vector): BoundingBox {
+        return this.union(position.x, position.y, position.z)
+    }
+
+    fun union(position: me.neon.libs.util.Location): BoundingBox {
         return this.union(position.x, position.y, position.z)
     }
 
@@ -321,7 +366,15 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
         )
     }
 
+    fun shift(shift: me.neon.libs.util.Vector): BoundingBox {
+        return this.shift(shift.x, shift.y, shift.z)
+    }
+
     fun shift(shift: Vector): BoundingBox {
+        return this.shift(shift.x, shift.y, shift.z)
+    }
+
+    fun shift(shift: me.neon.libs.util.Location): BoundingBox {
         return this.shift(shift.x, shift.y, shift.z)
     }
 
@@ -335,6 +388,23 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
 
     fun overlaps(other: BoundingBox): Boolean {
         return this.overlaps(other.minX, other.minY, other.minZ, other.maxX, other.maxY, other.maxZ)
+    }
+
+    fun overlaps(min: me.neon.libs.util.Vector, max: me.neon.libs.util.Vector): Boolean {
+        val x1 = min.x
+        val y1 = min.y
+        val z1 = min.z
+        val x2 = max.x
+        val y2 = max.y
+        val z2 = max.z
+        return this.overlaps(
+            x1.coerceAtMost(x2),
+            y1.coerceAtMost(y2),
+            z1.coerceAtMost(z2),
+            x1.coerceAtLeast(x2),
+            y1.coerceAtLeast(y2),
+            z1.coerceAtLeast(z2)
+        )
     }
 
     fun overlaps(min: Vector, max: Vector): Boolean {
@@ -358,6 +428,10 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
         return x >= minX && x < maxX && y >= minY && y < maxY && z >= minZ && z < maxZ
     }
 
+    operator fun contains(position: me.neon.libs.util.Vector): Boolean {
+        return this.contains(position.x, position.y, position.z)
+    }
+
     operator fun contains(position: Vector): Boolean {
         return this.contains(position.x, position.y, position.z)
     }
@@ -368,6 +442,23 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
 
     operator fun contains(other: BoundingBox): Boolean {
         return this.contains(other.minX, other.minY, other.minZ, other.maxX, other.maxY, other.maxZ)
+    }
+
+    fun contains(min: me.neon.libs.util.Vector, max: me.neon.libs.util.Vector): Boolean {
+        val x1 = min.x
+        val y1 = min.y
+        val z1 = min.z
+        val x2 = max.x
+        val y2 = max.y
+        val z2 = max.z
+        return this.contains(
+            x1.coerceAtMost(x2),
+            y1.coerceAtMost(y2),
+            z1.coerceAtMost(z2),
+            x1.coerceAtLeast(x2),
+            y1.coerceAtLeast(y2),
+            z1.coerceAtLeast(z2)
+        )
     }
 
     fun contains(min: Vector, max: Vector): Boolean {
@@ -385,6 +476,113 @@ class BoundingBox(x1: Double, y1: Double, z1: Double, x2: Double, y2: Double, z2
             y1.coerceAtLeast(y2),
             z1.coerceAtLeast(z2)
         )
+    }
+
+    fun rayTrace(start: me.neon.libs.util.Vector, direction: me.neon.libs.util.Vector, maxDistance: Double): RayTraceResult? {
+        start.checkFinite()
+        direction.checkFinite()
+        Validate.isTrue(direction.lengthSquared() > 0.0, "Direction's magnitude is 0!")
+        return if (maxDistance < 0.0) {
+            null
+        } else {
+            val startX = start.x
+            val startY = start.y
+            val startZ = start.z
+            // val dir = direction.clone().normalizeZeros().normalize()
+            val dir = direction.clone().normalize()
+            val dirX = dir.x
+            val dirY = dir.y
+            val dirZ = dir.z
+            val divX = 1.0 / dirX
+            val divY = 1.0 / dirY
+            val divZ = 1.0 / dirZ
+            var tMin: Double
+            var tMax: Double
+            var hitBlockFaceMin: BlockFace?
+            var hitBlockFaceMax: BlockFace?
+            if (dirX >= 0.0) {
+                tMin = (minX - startX) * divX
+                tMax = (maxX - startX) * divX
+                hitBlockFaceMin = BlockFace.WEST
+                hitBlockFaceMax = BlockFace.EAST
+            } else {
+                tMin = (maxX - startX) * divX
+                tMax = (minX - startX) * divX
+                hitBlockFaceMin = BlockFace.EAST
+                hitBlockFaceMax = BlockFace.WEST
+            }
+            val tyMin: Double
+            val tyMax: Double
+            val hitBlockFaceYMin: BlockFace
+            val hitBlockFaceYMax: BlockFace
+            if (dirY >= 0.0) {
+                tyMin = (minY - startY) * divY
+                tyMax = (maxY - startY) * divY
+                hitBlockFaceYMin = BlockFace.DOWN
+                hitBlockFaceYMax = BlockFace.UP
+            } else {
+                tyMin = (maxY - startY) * divY
+                tyMax = (minY - startY) * divY
+                hitBlockFaceYMin = BlockFace.UP
+                hitBlockFaceYMax = BlockFace.DOWN
+            }
+            if (tMin <= tyMax && tMax >= tyMin) {
+                if (tyMin > tMin) {
+                    tMin = tyMin
+                    hitBlockFaceMin = hitBlockFaceYMin
+                }
+                if (tyMax < tMax) {
+                    tMax = tyMax
+                    hitBlockFaceMax = hitBlockFaceYMax
+                }
+                val tzMin: Double
+                val tzMax: Double
+                val hitBlockFaceZMin: BlockFace
+                val hitBlockFaceZMax: BlockFace
+                if (dirZ >= 0.0) {
+                    tzMin = (minZ - startZ) * divZ
+                    tzMax = (maxZ - startZ) * divZ
+                    hitBlockFaceZMin = BlockFace.NORTH
+                    hitBlockFaceZMax = BlockFace.SOUTH
+                } else {
+                    tzMin = (maxZ - startZ) * divZ
+                    tzMax = (minZ - startZ) * divZ
+                    hitBlockFaceZMin = BlockFace.SOUTH
+                    hitBlockFaceZMax = BlockFace.NORTH
+                }
+                if (tMin <= tzMax && tMax >= tzMin) {
+                    if (tzMin > tMin) {
+                        tMin = tzMin
+                        hitBlockFaceMin = hitBlockFaceZMin
+                    }
+                    if (tzMax < tMax) {
+                        tMax = tzMax
+                        hitBlockFaceMax = hitBlockFaceZMax
+                    }
+                    if (tMax < 0.0) {
+                        null
+                    } else if (tMin > maxDistance) {
+                        null
+                    } else {
+                        val t: Double
+                        val hitBlockFace: BlockFace
+                        if (tMin < 0.0) {
+                            t = tMax
+                            hitBlockFace = hitBlockFaceMax
+                        } else {
+                            t = tMin
+                            hitBlockFace = hitBlockFaceMin
+                        }
+                        val hitPosition = dir.multiply(t).add(start)
+                        RayTraceResult(Vector(hitPosition.x, hitPosition.y, hitPosition.z), hitBlockFace)
+                    }
+                } else {
+                    null
+                }
+            } else {
+                null
+            }
+        }
     }
 
     fun rayTrace(start: Vector, direction: Vector, maxDistance: Double): RayTraceResult? {
