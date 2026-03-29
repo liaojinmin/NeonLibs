@@ -68,8 +68,9 @@ class ConfigVisitor : ClassVisitor(1) {
         if (field.isAnnotationPresent(Config::class.java)) {
             val configAnno = field.getAnnotation(Config::class.java)
             val name = configAnno.property("value", "config.yml")
-            if (files.containsKey(name)) {
-                field.set(instance?.get(), files[name]!!.configuration)
+            val map = files.computeIfAbsent(plugin) { HashMap() }
+            if (map.containsKey(name)) {
+                field.set(instance?.get(), map[name]!!.configuration)
             } else {
                 val file = File(plugin.dataFolder, name)
                 if (!file.exists()) {
@@ -98,7 +99,7 @@ class ConfigVisitor : ClassVisitor(1) {
                     val loader = NeonLibsServiceAPI.getAPI<ConfigNodeVisitor>(ConfigNodeVisitor::class.java.name)
                     configFile.nodes.forEach { loader.visitField(plugin, it, clazz, instance) }
                 }
-                files[name] = configFile
+                map[name] = configFile
             }
         }
     }
@@ -109,6 +110,6 @@ class ConfigVisitor : ClassVisitor(1) {
 
     companion object {
 
-        val files = HashMap<String, ConfigNodeFile>()
+        val files = mutableMapOf<Plugin, HashMap<String, ConfigNodeFile>>()
     }
 }

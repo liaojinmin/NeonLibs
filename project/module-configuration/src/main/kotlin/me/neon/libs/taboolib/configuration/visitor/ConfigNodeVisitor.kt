@@ -33,7 +33,8 @@ class ConfigNodeVisitor : ClassVisitor(2) {
             if (!bind.contains('.')) {
                 bind = "$bind.yml"
             }
-            val file = ConfigVisitor.files[bind]
+            val map = ConfigVisitor.files.computeIfAbsent(plugin) { HashMap() }
+            val file = map[bind]
             if (file == null) {
                 warning(
                     """
